@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>AGDMW PAM-simulator</title>
+<title>PAM-simulator</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
@@ -163,8 +163,8 @@ td.r{white-space:nowrap}
 <div class="wrap">
   <header class="top">
     <div class="intro">
-      <h1>AGDMW PAM-simulator</h1>
-      <p class="muted">Nagebootst netwerk van farmaceutisch productiebedrijf AGDMW. Zet PAM-principes aan of uit, log in als medewerker en zie wie waar bij kan. 1 seconde = 1 minuut simulatietijd.</p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h1 id="orgTitle">PAM-simulator</h1><span class="chip warn">Template · voorbeelddata</span></div>
+      <p class="muted" id="orgDesc"></p>
     </div>
     <div class="clock">
       <span class="muted">Simulatietijd</span>
@@ -211,7 +211,7 @@ td.r{white-space:nowrap}
 
   <section class="panel" aria-label="Audittrail">
     <div class="panel-head">
-      <h2>Audittrail (EU GMP Annex 11)</h2>
+      <h2>Audittrail</h2>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn small" id="copyLog" type="button">Kopieer audittrail</button>
         <button class="btn small ghost" id="clearLog" type="button">Leegmaken</button>
@@ -259,25 +259,46 @@ td.r{white-space:nowrap}
 </div>
 
 <script>
-const ROLES = {productie:"Operator productie", qa:"QA-analist", it:"IT-beheerder", extern:"Externe leverancier", hr:"HR-medewerker", directie:"Directie"};
-const USERS = [
-  {id:"sanne", name:"Sanne de Vries", role:"productie", device:true},
-  {id:"mark",  name:"Mark Jansen",    role:"qa",        device:true},
-  {id:"lisa",  name:"Lisa Bakker",    role:"it",        device:true},
-  {id:"ahmed", name:"Ahmed Yilmaz",   role:"extern",    device:false},
-  {id:"eva",   name:"Eva Smit",       role:"hr",        device:true},
-  {id:"peter", name:"Peter Visser",   role:"directie",  device:true}
-];
-const SYSTEMS = [
-  {id:"mes",    name:"MES", full:"Manufacturing Execution System", action:"Productieorder batch 24-0117 starten", kind:"normaal", roles:["productie"]},
-  {id:"lims",   name:"LIMS", full:"Laboratorium-informatiesysteem", action:"Testresultaat batch invoeren", kind:"normaal", roles:["qa"]},
-  {id:"erp",    name:"ERP", full:"Bedrijfsadministratie", action:"Inkooporders en budget inzien", kind:"normaal", roles:["directie"]},
-  {id:"hrshare",name:"HR-share", full:"Fileserver personeelsdossiers", action:"Personeelsdossier openen", kind:"normaal", roles:["hr","directie"]},
-  {id:"mescfg", name:"MES-beheer", full:"Manufacturing Execution System", action:"Receptuur en configuratie wijzigen", kind:"bevoorrecht", roles:["extern","it"]},
-  {id:"dc",     name:"Domain Controller", full:"DC01 · agdmw.lab", action:"Gebruikers en groepen beheren", kind:"bevoorrecht", roles:["it"]},
-  {id:"backup", name:"Backupserver", full:"BCK01", action:"Back-up terugzetten", kind:"bevoorrecht", roles:["it"]},
-  {id:"fw",     name:"Firewall", full:"FW01 · perimeter", action:"Firewallregels wijzigen", kind:"bevoorrecht", roles:["it"]}
-];
+/* =====================================================================
+   CONFIGURATIE — vul hier de situatie van de organisatie in.
+   Alles hieronder is generieke voorbeelddata.
+   ===================================================================== */
+const CONFIG = {
+  organisatie: "Organisatie X",
+  omschrijving: "Generieke simulatie van een bedrijfsnetwerk. Zet PAM-principes aan of uit, log in als medewerker en zie wie waar bij kan. 1 seconde = 1 minuut simulatietijd.",
+  domein: "organisatie.lab",
+
+  // Rollen: sleutel -> weergavenaam
+  roles: {
+    medewerker: "Medewerker",
+    beheer:     "IT-beheerder",
+    extern:     "Externe partij",
+    manager:    "Manager"
+  },
+
+  // Gebruikers. device:false = eigen/onbeheerd apparaat. approver:true = mag JIT-aanvragen goedkeuren.
+  users: [
+    {id:"u1", name:"Gebruiker A", role:"medewerker", device:true},
+    {id:"u2", name:"Gebruiker B", role:"beheer",     device:true,  approver:true},
+    {id:"u3", name:"Gebruiker C", role:"extern",     device:false},
+    {id:"u4", name:"Gebruiker D", role:"manager",    device:true,  approver:true}
+  ],
+
+  // Systemen. kind: "normaal" (dagelijks gebruik) of "bevoorrecht" (beheertaak).
+  // roles: welke rollen dit systeem volgens het beleid mogen gebruiken/beheren.
+  systems: [
+    {id:"app",   name:"Bedrijfsapplicatie", full:"Kernapplicatie (nog invullen)", action:"Dagelijkse taak uitvoeren",       kind:"normaal",     roles:["medewerker","manager"]},
+    {id:"files", name:"Fileserver",         full:"Gedeelde bestanden",           action:"Afdelingsmap openen",             kind:"normaal",     roles:["medewerker","manager"]},
+    {id:"appadm",name:"Applicatiebeheer",   full:"Kernapplicatie (nog invullen)", action:"Configuratie wijzigen",           kind:"bevoorrecht", roles:["beheer","extern"]},
+    {id:"dc",    name:"Domain Controller",  full:"DC01",                          action:"Gebruikers en groepen beheren",   kind:"bevoorrecht", roles:["beheer"]},
+    {id:"fw",    name:"Firewall",           full:"FW01",                          action:"Firewallregels wijzigen",         kind:"bevoorrecht", roles:["beheer"]}
+  ]
+};
+/* ===================================================================== */
+
+const ROLES = CONFIG.roles;
+const USERS = CONFIG.users;
+const SYSTEMS = CONFIG.systems;
 const PRINCIPLES = [
   {k:"rbac", name:"RBAC", desc:"Toegang hangt af van je rol, niet van wie je bent."},
   {k:"polp", name:"Least privilege", desc:"Alleen beheerrechten die bij je taak horen."},
@@ -287,10 +308,10 @@ const PRINCIPLES = [
 
 const S = {
   p:{rbac:true,polp:true,jit:true,zt:true},
-  active:"sanne",
-  mfa:{sanne:true,mark:true,lisa:true,ahmed:true,eva:true,peter:true},
-  jump:{sanne:false,mark:false,lisa:false,ahmed:false,eva:false,peter:false},
-  reqs:[], grants:[], log:[], clock:8*60, running:true, sel:"mes", nid:1
+  active:USERS[0].id,
+  mfa:Object.fromEntries(USERS.map(u=>[u.id,true])),
+  jump:Object.fromEntries(USERS.map(u=>[u.id,false])),
+  reqs:[], grants:[], log:[], clock:8*60, running:true, sel:SYSTEMS[0].id, nid:1
 };
 const $ = id => document.getElementById(id);
 const U = id => USERS.find(u=>u.id===id);
@@ -301,14 +322,14 @@ const initials = n => n.split(" ").filter(w=>w[0]===w[0].toUpperCase()).map(w=>w
 
 function log(who, what, res){ S.log.unshift({t:S.clock, who, what, res}); if(S.log.length>300) S.log.pop(); }
 function grantFor(uid, sid){ return S.grants.find(g=>g.user===uid && g.sys===sid && g.until>S.clock); }
-function approverFor(uid){ return uid==="lisa" ? U("peter") : U("lisa"); }
+function approverFor(uid){ return USERS.find(u=>u.approver && u.id!==uid) || {name:"Beheerder"}; }
 
 function decide(u, s, ctx, p){
   const tr=[];
   if(p.zt){
     if(!ctx.mfa){ tr.push({k:"Zero Trust",st:"bad",txt:"Geen MFA-bevestiging in deze sessie. Een wachtwoord alleen is niet genoeg."}); return {res:"deny",tr}; }
-    if(!ctx.device){ tr.push({k:"Zero Trust",st:"bad",txt:"Apparaat is niet beheerd door AGDMW. Verbind via de PAM-jumphost."}); return {res:"deny",tr}; }
-    tr.push({k:"Zero Trust",st:"ok",txt:"MFA bevestigd en apparaat "+(u.device?"beheerd door AGDMW.":"via de PAM-jumphost.")});
+    if(!ctx.device){ tr.push({k:"Zero Trust",st:"bad",txt:"Apparaat is niet beheerd door "+CONFIG.organisatie+". Verbind via de PAM-jumphost."}); return {res:"deny",tr}; }
+    tr.push({k:"Zero Trust",st:"ok",txt:"MFA bevestigd en apparaat "+(u.device?"beheerd door "+CONFIG.organisatie+".":"via de PAM-jumphost.")});
   } else tr.push({k:"Zero Trust",st:"off",txt:"Uit: identiteit en apparaat worden niet gecontroleerd."});
 
   if(s.kind==="normaal"){
@@ -380,7 +401,7 @@ function renderBlast(){
   const now=countAllow(u,S.p), base=countAllow(u,{rbac:false,polp:false,jit:false,zt:false});
   $("blast").innerHTML = `
     <h2>Als dit account gehackt wordt</h2>
-    <p style="font-size:12.5px" class="muted">Aanvaller heeft het wachtwoord van ${esc(u.name.split(" ")[0])} via phishing, maar geen MFA-telefoon en geen bedrijfslaptop.</p>
+    <p style="font-size:12.5px" class="muted">Aanvaller heeft het wachtwoord van ${esc(u.name)} via phishing, maar geen MFA-telefoon en geen bedrijfslaptop.</p>
     <div style="display:flex;align-items:baseline;gap:6px"><span class="num mono">${now.length}</span><span class="muted">van ${n} systemen bereikbaar</span></div>
     <div class="blast-row"><div class="lbl"><span>Huidige instellingen</span><span class="mono">${now.length}/${n}</span></div><div class="bar"><i style="width:${now.length/n*100}%"></i></div></div>
     <div class="blast-row"><div class="lbl"><span>Zonder PAM</span><span class="mono">${base.length}/${n}</span></div><div class="bar base"><i style="width:${base.length/n*100}%"></i></div></div>
@@ -404,7 +425,7 @@ function renderSystems(){
       <div class="sys-action">${esc(s.action)}</div>
       <div class="sys-foot">${btn}</div></div>`;
   }).join("");
-  $("sysSummary").textContent = ok+" van "+SYSTEMS.length+" toegankelijk voor "+u.name.split(" ")[0];
+  $("sysSummary").textContent = ok+" van "+SYSTEMS.length+" toegankelijk voor "+u.name;
 }
 function renderTrace(){
   const u=U(S.active), s=SY(S.sel);
@@ -412,7 +433,7 @@ function renderTrace(){
   const d=decide(u,s,ctxFor(u),S.p), [cls,label]=STATUS[d.res];
   $("trace").innerHTML = `
     <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center">
-      <h2>Beslissing: ${esc(u.name.split(" ")[0])} → ${esc(s.name)}</h2>
+      <h2>Beslissing: ${esc(u.name)} → ${esc(s.name)}</h2>
       <span class="chip ${cls} verdict">${label}</span>
     </div>
     <ol>${d.tr.map(t=>`<li class="${t.st}"><b>${t.k}</b><span>${esc(t.txt)}</span></li>`).join("")}</ol>`;
@@ -425,10 +446,10 @@ function renderQueue(){
       <div><b>${esc(u.name)}</b> → ${esc(s.name)}</div>
       <div class="meta">${esc(r.reason)}${r.ticket?" · "+esc(r.ticket):""} · ${r.dur} min · aangevraagd ${fmt(r.t)}</div>
       <div class="acts">
-        <button type="button" class="btn small primary" data-approve="${r.id}">Goedkeuren als ${esc(a.name.split(" ")[0])}</button>
+        <button type="button" class="btn small primary" data-approve="${r.id}">Goedkeuren als ${esc(a.name)}</button>
         <button type="button" class="btn small danger" data-reject="${r.id}">Afwijzen</button>
       </div>
-      ${r.user==="lisa"?`<div class="meta">Vier-ogenprincipe: Lisa kan haar eigen aanvraag niet goedkeuren.</div>`:""}
+      ${U(r.user).approver?`<div class="meta">Vier-ogenprincipe: ${esc(U(r.user).name)} kan de eigen aanvraag niet goedkeuren.</div>`:""}
     </div>`;}).join("") : `<p class="empty">Geen openstaande aanvragen.</p>`;
   const g=S.grants.filter(g=>g.until>S.clock);
   $("grants").innerHTML = g.length? g.map(x=>{
@@ -476,7 +497,7 @@ document.addEventListener("click", e=>{
   if(t.dataset.revoke){
     const g=S.grants.find(x=>x.id==t.dataset.revoke); if(!g) return;
     S.grants=S.grants.filter(x=>x!==g);
-    log("Lisa Bakker","JIT-sessie ingetrokken: "+U(g.user).name+" → "+SY(g.sys).name,"info");
+    log(approverFor(g.user).name,"JIT-sessie ingetrokken: "+U(g.user).name+" → "+SY(g.sys).name,"info");
     live(); return;
   }
   if(t.dataset.sel){ S.sel=t.dataset.sel; renderSystems(); renderTrace(); }
@@ -529,14 +550,11 @@ setInterval(()=>{
   live();
 },1000);
 
-/* Startsituatie (voorbeeld) */
-log("Lisa Bakker","Ingelogd op werkplek","info");
-log("Lisa Bakker","JIT aangevraagd: Backupserver (Gepland onderhoud, CHG-1038, 30 min)","warn");
-log("Peter Visser","JIT goedgekeurd: Lisa Bakker → Backupserver voor 30 min","ok");
-S.grants.push({id:S.nid++, user:"lisa", sys:"backup", until:S.clock+25, dur:30});
-S.reqs.push({id:S.nid++, user:"ahmed", sys:"mescfg", reason:"Gepland onderhoud", ticket:"CHG-1042", dur:30, t:S.clock});
-log("Ahmed Yilmaz","JIT aangevraagd: MES-beheer (Gepland onderhoud, CHG-1042, 30 min)","warn");
-log("Sanne de Vries","Ingelogd op werkplek","info");
+/* Startsituatie */
+document.title = "PAM-simulator · "+CONFIG.organisatie;
+$("orgTitle").textContent = "PAM-simulator · "+CONFIG.organisatie;
+$("orgDesc").textContent = CONFIG.omschrijving;
+log("Systeem","Simulatie gestart voor "+CONFIG.organisatie+" ("+CONFIG.domein+")","info");
 all();
 </script>
 </body>
