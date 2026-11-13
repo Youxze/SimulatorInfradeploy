@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AGDMW PAM-simulator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: cleanroom-console — drie kolommen (medewerkers · systemen · aanvragen), audittrail eronder */
+:root{
+  --bg:#EEF3F3; --surface:#FFFFFF; --sunk:#E3EBEB; --ink:#132326; --muted:#566B6E; --line:#D2DDDD;
+  --accent:#0E6B70; --accent-soft:#D6ECEC; --on-accent:#FFFFFF;
+  --ok:#1D7643; --ok-soft:#DDF0E4; --warn:#9A6200; --warn-soft:#F7EBD2; --bad:#B0281F; --bad-soft:#F8DEDB; --off:#7C8C8E; --off-soft:#E6ECEC;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1718; --surface:#142123; --sunk:#0F1B1C; --ink:#E2EDED; --muted:#91A6A8; --line:#263738;
+  --accent:#55B9BC; --accent-soft:#173638; --on-accent:#08201F;
+  --ok:#62C68E; --ok-soft:#173226; --warn:#E3AA4E; --warn-soft:#382A12; --bad:#F2837A; --bad-soft:#3D1D1A; --off:#7F9294; --off-soft:#1C2A2B;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1718; --surface:#142123; --sunk:#0F1B1C; --ink:#E2EDED; --muted:#91A6A8; --line:#263738;
+  --accent:#55B9BC; --accent-soft:#173638; --on-accent:#08201F;
+  --ok:#62C68E; --ok-soft:#173226; --warn:#E3AA4E; --warn-soft:#382A12; --bad:#F2837A; --bad-soft:#3D1D1A; --off:#7F9294; --off-soft:#1C2A2B;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{margin:0;text-wrap:balance}
+h1{font-size:22px;font-weight:700;letter-spacing:-.01em}
+h2{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.top .intro{display:flex;flex-direction:column;gap:4px;max-width:62ch}
+.clock{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.clock .time{font-size:20px;font-weight:500}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 12px;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.small{padding:4px 10px;font-size:13px}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.55;cursor:default}
+
+/* Principe-balk */
+.policy{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.policy-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:6px 12px;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.principles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.pr{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:8px;background:var(--sunk);border:1px solid transparent}
+.pr.on{border-color:var(--accent);background:var(--accent-soft)}
+.pr div{min-width:0}
+.pr strong{display:block;font-size:14px}
+.pr small{display:block;color:var(--muted);font-size:12.5px}
+.switch{appearance:none;flex:none;width:34px;height:20px;border-radius:10px;background:var(--off);position:relative;margin:1px 0 0;cursor:pointer;transition:background .15s}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:transform .15s}
+.switch:checked{background:var(--accent)}
+.switch:checked::after{transform:translateX(14px)}
+
+/* Hoofdraster */
+.grid{display:grid;grid-template-columns:270px minmax(0,1fr) 330px;gap:16px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+
+/* Medewerkers */
+.users{display:flex;flex-direction:column;gap:4px}
+.user{display:flex;gap:10px;align-items:center;text-align:left;border:1px solid transparent;background:transparent;border-radius:8px;padding:7px 8px;width:100%}
+.user:hover{background:var(--sunk)}
+.user[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.avatar{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:12px;background:var(--sunk);border:1px solid var(--line)}
+.user[aria-pressed="true"] .avatar{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.user .who{min-width:0;display:flex;flex-direction:column}
+.user .who b{font-weight:600}
+.user .who span{font-size:12.5px;color:var(--muted)}
+.session{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.row-toggle{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.row-toggle small{display:block;color:var(--muted);font-size:12.5px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.chip.ok{color:var(--ok);background:var(--ok-soft)}
+.chip.warn{color:var(--warn);background:var(--warn-soft)}
+.chip.bad{color:var(--bad);background:var(--bad-soft)}
+.chip.off{color:var(--off);background:var(--off-soft)}
+
+/* Blast radius */
+.blast{background:var(--sunk);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.blast .num{font-size:26px;font-weight:600;line-height:1}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--bad);transition:width .3s}
+.bar.base i{background:var(--off)}
+.blast-row{display:flex;flex-direction:column;gap:4px}
+.blast-row .lbl{display:flex;justify-content:space-between;font-size:12.5px}
+
+/* Systemen */
+.systems{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.sys{border:1px solid var(--line);border-radius:9px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--surface);cursor:pointer;text-align:left}
+.sys:hover{border-color:var(--muted)}
+.sys.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.sys-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.sys-name{font-weight:600}
+.sys-full{font-size:12px;color:var(--muted)}
+.sys-action{font-size:13.5px}
+.kind{font-size:11px;text-transform:uppercase;letter-spacing:.07em;font-weight:600;color:var(--muted)}
+.kind.priv{color:var(--warn)}
+.sys-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;flex-wrap:wrap}
+
+/* Beslisregel */
+.trace{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.trace ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.trace li{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;align-items:start;padding:8px 10px;border-radius:7px;background:var(--sunk);border-left:3px solid var(--off)}
+.trace li.ok{border-left-color:var(--ok)}
+.trace li.warn{border-left-color:var(--warn)}
+.trace li.bad{border-left-color:var(--bad)}
+.trace li b{font-size:12.5px}
+.verdict{font-weight:600}
+
+/* Aanvragen */
+.req{border:1px solid var(--line);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.req .meta{font-size:12.5px;color:var(--muted)}
+.req .acts{display:flex;gap:6px;flex-wrap:wrap}
+.empty{font-size:13px;color:var(--muted);padding:8px 0}
+.list{display:flex;flex-direction:column;gap:8px}
+.grant .bar i{background:var(--accent)}
+
+/* Audittrail */
+.logwrap{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{position:sticky;top:0;background:var(--sunk);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+td.t{font-family:var(--mono);white-space:nowrap;color:var(--muted)}
+td.r{white-space:nowrap}
+
+/* Dialoog */
+.overlay{position:fixed;inset:0;background:rgba(10,20,22,.45);display:grid;place-items:center;padding:16px;z-index:20}
+.dialog{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;width:min(440px,100%);display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12.5px;font-weight:600}
+.field select,.field input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px}
+.dialog .acts{display:flex;gap:8px;justify-content:flex-end}
+
+@media (max-width:1100px){.grid{grid-template-columns:260px minmax(0,1fr)}.side{grid-column:1/-1}}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}.principles{grid-template-columns:repeat(2,minmax(0,1fr))}.trace li{grid-template-columns:1fr}}
+@media (max-width:440px){.principles{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="intro">
+      <h1>AGDMW PAM-simulator</h1>
+      <p class="muted">Nagebootst netwerk van farmaceutisch productiebedrijf AGDMW. Zet PAM-principes aan of uit, log in als medewerker en zie wie waar bij kan. 1 seconde = 1 minuut simulatietijd.</p>
+    </div>
+    <div class="clock">
+      <span class="muted">Simulatietijd</span>
+      <span class="time mono" id="clock">08:00</span>
+      <button class="btn small" id="pause" type="button">Pauze</button>
+    </div>
+  </header>
+
+  <section class="policy" aria-label="PAM-beleid">
+    <div class="policy-head">
+      <h2>Beveiligingsbeleid</h2>
+      <div class="seg" role="group" aria-label="Scenario">
+        <button type="button" id="presetOff" aria-pressed="false">Huidige situatie (geen PAM)</button>
+        <button type="button" id="presetOn" aria-pressed="true">Advies: volledige PAM</button>
+      </div>
+    </div>
+    <div class="principles" id="principles"></div>
+  </section>
+
+  <div class="grid">
+    <section class="panel" aria-label="Medewerkers">
+      <h2>Inloggen als</h2>
+      <div class="users" id="users"></div>
+      <div class="session" id="session"></div>
+      <div class="blast" id="blast"></div>
+    </section>
+
+    <section class="panel" aria-label="Systemen">
+      <div class="panel-head">
+        <h2>Systemen</h2>
+        <span class="muted" id="sysSummary"></span>
+      </div>
+      <div class="systems" id="systems"></div>
+      <div class="trace" id="trace"></div>
+    </section>
+
+    <section class="panel side" aria-label="Just-in-time toegang">
+      <h2>JIT-aanvragen</h2>
+      <div class="list" id="queue"></div>
+      <h2>Actieve beheersessies</h2>
+      <div class="list" id="grants"></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-label="Audittrail">
+    <div class="panel-head">
+      <h2>Audittrail (EU GMP Annex 11)</h2>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn small" id="copyLog" type="button">Kopieer audittrail</button>
+        <button class="btn small ghost" id="clearLog" type="button">Leegmaken</button>
+      </div>
+    </div>
+    <div class="logwrap">
+      <table>
+        <thead><tr><th>Tijd</th><th>Wie</th><th>Gebeurtenis</th><th>Resultaat</th></tr></thead>
+        <tbody id="log"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="jitOverlay" hidden>
+  <form class="dialog" id="jitForm" aria-labelledby="jitTitle">
+    <h3 id="jitTitle">Tijdelijke beheerrechten aanvragen</h3>
+    <p class="muted" id="jitWhat"></p>
+    <div class="field">
+      <label for="jitReason">Reden</label>
+      <select id="jitReason">
+        <option>Storing verhelpen</option>
+        <option>Gepland onderhoud</option>
+        <option>Software-update installeren</option>
+        <option>Onderzoek beveiligingsincident</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="jitTicket">Ticket- of changenummer</label>
+      <input id="jitTicket" placeholder="bijv. CHG-1043" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="jitDur">Duur</label>
+      <select id="jitDur">
+        <option value="15">15 minuten</option>
+        <option value="30" selected>30 minuten</option>
+        <option value="60">60 minuten</option>
+      </select>
+    </div>
+    <div class="acts">
+      <button class="btn ghost" type="button" id="jitCancel">Annuleren</button>
+      <button class="btn primary" type="submit">Aanvraag indienen</button>
+    </div>
+  </form>
+</div>
+
+<script>
+const ROLES = {productie:"Operator productie", qa:"QA-analist", it:"IT-beheerder", extern:"Externe leverancier", hr:"HR-medewerker", directie:"Directie"};
+const USERS = [
+  {id:"sanne", name:"Sanne de Vries", role:"productie", device:true},
+  {id:"mark",  name:"Mark Jansen",    role:"qa",        device:true},
+  {id:"lisa",  name:"Lisa Bakker",    role:"it",        device:true},
+  {id:"ahmed", name:"Ahmed Yilmaz",   role:"extern",    device:false},
+  {id:"eva",   name:"Eva Smit",       role:"hr",        device:true},
+  {id:"peter", name:"Peter Visser",   role:"directie",  device:true}
+];
+const SYSTEMS = [
+  {id:"mes",    name:"MES", full:"Manufacturing Execution System", action:"Productieorder batch 24-0117 starten", kind:"normaal", roles:["productie"]},
+  {id:"lims",   name:"LIMS", full:"Laboratorium-informatiesysteem", action:"Testresultaat batch invoeren", kind:"normaal", roles:["qa"]},
+  {id:"erp",    name:"ERP", full:"Bedrijfsadministratie", action:"Inkooporders en budget inzien", kind:"normaal", roles:["directie"]},
+  {id:"hrshare",name:"HR-share", full:"Fileserver personeelsdossiers", action:"Personeelsdossier openen", kind:"normaal", roles:["hr","directie"]},
+  {id:"mescfg", name:"MES-beheer", full:"Manufacturing Execution System", action:"Receptuur en configuratie wijzigen", kind:"bevoorrecht", roles:["extern","it"]},
+  {id:"dc",     name:"Domain Controller", full:"DC01 · agdmw.lab", action:"Gebruikers en groepen beheren", kind:"bevoorrecht", roles:["it"]},
+  {id:"backup", name:"Backupserver", full:"BCK01", action:"Back-up terugzetten", kind:"bevoorrecht", roles:["it"]},
+  {id:"fw",     name:"Firewall", full:"FW01 · perimeter", action:"Firewallregels wijzigen", kind:"bevoorrecht", roles:["it"]}
+];
+const PRINCIPLES = [
+  {k:"rbac", name:"RBAC", desc:"Toegang hangt af van je rol, niet van wie je bent."},
+  {k:"polp", name:"Least privilege", desc:"Alleen beheerrechten die bij je taak horen."},
+  {k:"jit",  name:"Just-in-time", desc:"Beheerrechten alleen tijdelijk, na goedkeuring."},
+  {k:"zt",   name:"Zero Trust", desc:"Elke keer MFA en een veilig apparaat controleren."}
+];
+
+const S = {
+  p:{rbac:true,polp:true,jit:true,zt:true},
+  active:"sanne",
+  mfa:{sanne:true,mark:true,lisa:true,ahmed:true,eva:true,peter:true},
+  jump:{sanne:false,mark:false,lisa:false,ahmed:false,eva:false,peter:false},
+  reqs:[], grants:[], log:[], clock:8*60, running:true, sel:"mes", nid:1
+};
+const $ = id => document.getElementById(id);
+const U = id => USERS.find(u=>u.id===id);
+const SY = id => SYSTEMS.find(s=>s.id===id);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = m => { m=((m%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0"); };
+const initials = n => n.split(" ").filter(w=>w[0]===w[0].toUpperCase()).map(w=>w[0]).slice(0,2).join("");
+
+function log(who, what, res){ S.log.unshift({t:S.clock, who, what, res}); if(S.log.length>300) S.log.pop(); }
+function grantFor(uid, sid){ return S.grants.find(g=>g.user===uid && g.sys===sid && g.until>S.clock); }
+function approverFor(uid){ return uid==="lisa" ? U("peter") : U("lisa"); }
+
+function decide(u, s, ctx, p){
+  const tr=[];
+  if(p.zt){
+    if(!ctx.mfa){ tr.push({k:"Zero Trust",st:"bad",txt:"Geen MFA-bevestiging in deze sessie. Een wachtwoord alleen is niet genoeg."}); return {res:"deny",tr}; }
+    if(!ctx.device){ tr.push({k:"Zero Trust",st:"bad",txt:"Apparaat is niet beheerd door AGDMW. Verbind via de PAM-jumphost."}); return {res:"deny",tr}; }
+    tr.push({k:"Zero Trust",st:"ok",txt:"MFA bevestigd en apparaat "+(u.device?"beheerd door AGDMW.":"via de PAM-jumphost.")});
+  } else tr.push({k:"Zero Trust",st:"off",txt:"Uit: identiteit en apparaat worden niet gecontroleerd."});
+
+  if(s.kind==="normaal"){
+    if(p.rbac){
+      if(s.roles.includes(u.role)) tr.push({k:"RBAC",st:"ok",txt:"Rol "+ROLES[u.role]+" is gemachtigd voor dit systeem."});
+      else { tr.push({k:"RBAC",st:"bad",txt:"Rol "+ROLES[u.role]+" hoort niet bij dit systeem."}); return {res:"deny",tr}; }
+    } else tr.push({k:"RBAC",st:"warn",txt:"Uit: elke medewerker kan dit systeem gebruiken."});
+    tr.push({k:"PoLP / JIT",st:"off",txt:"Niet van toepassing: dit is normaal gebruik, geen beheertaak."});
+    return {res:"allow",tr};
+  }
+  if(p.polp){
+    if(s.roles.includes(u.role)) tr.push({k:"Least privilege",st:"ok",txt:"Rol "+ROLES[u.role]+" mag deze beheertaak uitvoeren."});
+    else { tr.push({k:"Least privilege",st:"bad",txt:"Rol "+ROLES[u.role]+" heeft geen beheerrechten op dit systeem."}); return {res:"deny",tr}; }
+  } else {
+    tr.push({k:"Least privilege",st:"warn",txt:"Uit: iedereen heeft beheerrechten op alle systemen."});
+    tr.push({k:"Just-in-time",st:"off",txt:"Niet relevant: rechten zijn al permanent toegekend."});
+    return {res:"allow",tr};
+  }
+  if(p.jit){
+    const g = ctx.grants && grantFor(u.id, s.id);
+    if(g){ tr.push({k:"Just-in-time",st:"ok",txt:"JIT-sessie actief, verloopt over "+(g.until-S.clock)+" min."}); return {res:"allow",tr,g}; }
+    tr.push({k:"Just-in-time",st:"warn",txt:"Geen actieve sessie. Vraag tijdelijke rechten aan; IT keurt goed."});
+    return {res:"jit",tr};
+  }
+  tr.push({k:"Just-in-time",st:"warn",txt:"Uit: beheerrechten staan permanent aan (standing privilege)."});
+  return {res:"allow",tr};
+}
+function ctxFor(u){ return {mfa:S.mfa[u.id], device:u.device||S.jump[u.id], grants:true}; }
+
+/* ---------- Render ---------- */
+function renderPolicy(){
+  $("principles").innerHTML = PRINCIPLES.map(pr=>`
+    <label class="pr ${S.p[pr.k]?"on":""}" for="p_${pr.k}">
+      <input type="checkbox" class="switch" id="p_${pr.k}" data-k="${pr.k}" ${S.p[pr.k]?"checked":""}>
+      <div><strong>${pr.name}</strong><small>${pr.desc}</small></div>
+    </label>`).join("");
+  const all = Object.values(S.p).every(Boolean), none = Object.values(S.p).every(v=>!v);
+  $("presetOn").setAttribute("aria-pressed", all); $("presetOff").setAttribute("aria-pressed", none);
+}
+function renderUsers(){
+  $("users").innerHTML = USERS.map(u=>`
+    <button type="button" class="user" data-u="${u.id}" aria-pressed="${u.id===S.active}">
+      <span class="avatar">${initials(u.name)}</span>
+      <span class="who"><b>${esc(u.name)}</b><span>${ROLES[u.role]}</span></span>
+    </button>`).join("");
+}
+function renderSession(){
+  const u=U(S.active);
+  $("session").innerHTML = `
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
+      <h2>Sessie</h2>
+      <span class="chip ${u.device?"ok":"warn"}">${u.device?"Beheerd apparaat":"Eigen laptop"}</span>
+    </div>
+    <label class="row-toggle" for="mfaT">
+      <input type="checkbox" class="switch" id="mfaT" ${S.mfa[u.id]?"checked":""}>
+      <span>MFA bevestigd<small>Code uit de authenticator-app ingevoerd.</small></span>
+    </label>
+    <label class="row-toggle" for="jumpT">
+      <input type="checkbox" class="switch" id="jumpT" ${S.jump[u.id]?"checked":""} ${u.device?"disabled":""}>
+      <span>Via PAM-jumphost<small>${u.device?"Niet nodig: apparaat is al beheerd.":"Beheerde tussenserver; sessie wordt opgenomen."}</small></span>
+    </label>`;
+}
+function countAllow(u, p){
+  const ctx={mfa:false, device:false, grants:true};
+  return SYSTEMS.filter(s=>decide(u,s,ctx,p).res==="allow");
+}
+function renderBlast(){
+  const u=U(S.active), n=SYSTEMS.length;
+  const now=countAllow(u,S.p), base=countAllow(u,{rbac:false,polp:false,jit:false,zt:false});
+  $("blast").innerHTML = `
+    <h2>Als dit account gehackt wordt</h2>
+    <p style="font-size:12.5px" class="muted">Aanvaller heeft het wachtwoord van ${esc(u.name.split(" ")[0])} via phishing, maar geen MFA-telefoon en geen bedrijfslaptop.</p>
+    <div style="display:flex;align-items:baseline;gap:6px"><span class="num mono">${now.length}</span><span class="muted">van ${n} systemen bereikbaar</span></div>
+    <div class="blast-row"><div class="lbl"><span>Huidige instellingen</span><span class="mono">${now.length}/${n}</span></div><div class="bar"><i style="width:${now.length/n*100}%"></i></div></div>
+    <div class="blast-row"><div class="lbl"><span>Zonder PAM</span><span class="mono">${base.length}/${n}</span></div><div class="bar base"><i style="width:${base.length/n*100}%"></i></div></div>
+    ${now.length?`<p style="font-size:12.5px">Bereikbaar: ${now.map(s=>esc(s.name)+(s.kind==="bevoorrecht"?" (beheer)":"")).join(", ")}</p>`:`<p style="font-size:12.5px">Niets bereikbaar met alleen het wachtwoord.</p>`}`;
+}
+const STATUS = {allow:["ok","Toegang"], jit:["warn","JIT nodig"], deny:["bad","Geweigerd"]};
+function renderSystems(){
+  const u=U(S.active); let ok=0;
+  $("systems").innerHTML = SYSTEMS.map(s=>{
+    const d=decide(u,s,ctxFor(u),S.p); if(d.res==="allow") ok++;
+    const [cls,label]=STATUS[d.res];
+    const pending=S.reqs.find(r=>r.user===u.id&&r.sys===s.id);
+    let btn;
+    if(d.res==="allow") btn=`<button type="button" class="btn small primary" data-open="${s.id}">Openen</button>`;
+    else if(d.res==="jit") btn= pending?`<button type="button" class="btn small" disabled>Wacht op goedkeuring</button>`:`<button type="button" class="btn small" data-jit="${s.id}">JIT aanvragen</button>`;
+    else btn=`<button type="button" class="btn small" data-open="${s.id}">Probeer toegang</button>`;
+    return `<div class="sys ${S.sel===s.id?"sel":""}" data-sel="${s.id}" tabindex="0" role="button" aria-label="${esc(s.name)}: details tonen">
+      <div class="sys-top"><div><div class="sys-name">${esc(s.name)}</div><div class="sys-full">${esc(s.full)}</div></div>
+      <span class="chip ${cls}">${d.g?"JIT · "+(d.g.until-S.clock)+" min":label}</span></div>
+      <div class="kind ${s.kind==="bevoorrecht"?"priv":""}">${s.kind==="bevoorrecht"?"Beheertaak":"Normaal gebruik"}</div>
+      <div class="sys-action">${esc(s.action)}</div>
+      <div class="sys-foot">${btn}</div></div>`;
+  }).join("");
+  $("sysSummary").textContent = ok+" van "+SYSTEMS.length+" toegankelijk voor "+u.name.split(" ")[0];
+}
+function renderTrace(){
+  const u=U(S.active), s=SY(S.sel);
+  if(!s){ $("trace").innerHTML=""; return; }
+  const d=decide(u,s,ctxFor(u),S.p), [cls,label]=STATUS[d.res];
+  $("trace").innerHTML = `
+    <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center">
+      <h2>Beslissing: ${esc(u.name.split(" ")[0])} → ${esc(s.name)}</h2>
+      <span class="chip ${cls} verdict">${label}</span>
+    </div>
+    <ol>${d.tr.map(t=>`<li class="${t.st}"><b>${t.k}</b><span>${esc(t.txt)}</span></li>`).join("")}</ol>`;
+}
+function renderQueue(){
+  const q=S.reqs;
+  $("queue").innerHTML = q.length? q.map(r=>{
+    const u=U(r.user), s=SY(r.sys), a=approverFor(r.user);
+    return `<div class="req">
+      <div><b>${esc(u.name)}</b> → ${esc(s.name)}</div>
+      <div class="meta">${esc(r.reason)}${r.ticket?" · "+esc(r.ticket):""} · ${r.dur} min · aangevraagd ${fmt(r.t)}</div>
+      <div class="acts">
+        <button type="button" class="btn small primary" data-approve="${r.id}">Goedkeuren als ${esc(a.name.split(" ")[0])}</button>
+        <button type="button" class="btn small danger" data-reject="${r.id}">Afwijzen</button>
+      </div>
+      ${r.user==="lisa"?`<div class="meta">Vier-ogenprincipe: Lisa kan haar eigen aanvraag niet goedkeuren.</div>`:""}
+    </div>`;}).join("") : `<p class="empty">Geen openstaande aanvragen.</p>`;
+  const g=S.grants.filter(g=>g.until>S.clock);
+  $("grants").innerHTML = g.length? g.map(x=>{
+    const u=U(x.user), s=SY(x.sys), left=x.until-S.clock;
+    return `<div class="req grant">
+      <div style="display:flex;justify-content:space-between;gap:8px"><span><b>${esc(u.name)}</b> → ${esc(s.name)}</span><span class="mono">${left} min</span></div>
+      <div class="bar"><i style="width:${Math.max(0,left/x.dur*100)}%"></i></div>
+      <div class="acts"><button type="button" class="btn small danger" data-revoke="${x.id}">Intrekken</button></div>
+    </div>`;}).join("") : `<p class="empty">Niemand heeft op dit moment beheerrechten.</p>`;
+}
+const RES = {ok:["ok","Toegestaan"], bad:["bad","Geweigerd"], warn:["warn","Wacht"], info:["off","Info"]};
+function renderLog(){
+  $("log").innerHTML = S.log.length? S.log.map(l=>`<tr><td class="t">${fmt(l.t)}</td><td>${esc(l.who)}</td><td>${esc(l.what)}</td><td class="r"><span class="chip ${RES[l.res][0]}">${RES[l.res][1]}</span></td></tr>`).join("")
+    : `<tr><td colspan="4" class="muted">Nog geen gebeurtenissen.</td></tr>`;
+}
+function renderClock(){ $("clock").textContent=fmt(S.clock); $("pause").textContent=S.running?"Pauze":"Hervat"; }
+function live(){ renderClock(); renderSystems(); renderTrace(); renderQueue(); renderBlast(); renderLog(); }
+function all(){ renderPolicy(); renderUsers(); renderSession(); live(); }
+
+/* ---------- Acties ---------- */
+document.addEventListener("click", e=>{
+  const t=e.target.closest("button,[data-sel]"); if(!t) return;
+  if(t.dataset.u){ S.active=t.dataset.u; log(U(S.active).name,"Ingelogd op werkplek","info"); all(); return; }
+  if(t.dataset.open){
+    const u=U(S.active), s=SY(t.dataset.open), d=decide(u,s,ctxFor(u),S.p);
+    S.sel=s.id;
+    const reason=d.tr.filter(x=>x.st==="bad").map(x=>x.txt)[0];
+    log(u.name, s.name+": "+s.action+(reason?" — "+reason:""), d.res==="allow"?"ok":"bad");
+    live(); return;
+  }
+  if(t.dataset.jit){ S.sel=t.dataset.jit; openJit(t.dataset.jit); live(); return; }
+  if(t.dataset.approve){
+    const r=S.reqs.find(x=>x.id==t.dataset.approve); if(!r) return;
+    S.reqs=S.reqs.filter(x=>x!==r);
+    S.grants.push({id:S.nid++, user:r.user, sys:r.sys, until:S.clock+r.dur, dur:r.dur});
+    log(approverFor(r.user).name, "JIT goedgekeurd: "+U(r.user).name+" → "+SY(r.sys).name+" voor "+r.dur+" min","ok");
+    live(); return;
+  }
+  if(t.dataset.reject){
+    const r=S.reqs.find(x=>x.id==t.dataset.reject); if(!r) return;
+    S.reqs=S.reqs.filter(x=>x!==r);
+    log(approverFor(r.user).name, "JIT afgewezen: "+U(r.user).name+" → "+SY(r.sys).name,"bad");
+    live(); return;
+  }
+  if(t.dataset.revoke){
+    const g=S.grants.find(x=>x.id==t.dataset.revoke); if(!g) return;
+    S.grants=S.grants.filter(x=>x!==g);
+    log("Lisa Bakker","JIT-sessie ingetrokken: "+U(g.user).name+" → "+SY(g.sys).name,"info");
+    live(); return;
+  }
+  if(t.dataset.sel){ S.sel=t.dataset.sel; renderSystems(); renderTrace(); }
+});
+document.addEventListener("keydown", e=>{
+  const t=e.target; if(t.dataset && t.dataset.sel && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); S.sel=t.dataset.sel; renderSystems(); renderTrace(); }
+});
+document.addEventListener("change", e=>{
+  const t=e.target;
+  if(t.dataset.k){ S.p[t.dataset.k]=t.checked; log("Beheer", PRINCIPLES.find(p=>p.k===t.dataset.k).name+" "+(t.checked?"ingeschakeld":"uitgeschakeld"),"info"); renderPolicy(); live(); }
+  if(t.id==="mfaT"){ S.mfa[S.active]=t.checked; log(U(S.active).name, t.checked?"MFA bevestigd":"MFA-sessie verlopen","info"); live(); }
+  if(t.id==="jumpT"){ S.jump[S.active]=t.checked; log(U(S.active).name, t.checked?"Verbonden via PAM-jumphost":"Jumphost-sessie beëindigd","info"); live(); }
+});
+function preset(on){ for(const k in S.p) S.p[k]=on; log("Beheer", on?"Scenario: volledige PAM toegepast":"Scenario: huidige situatie zonder PAM","info"); renderPolicy(); live(); }
+$("presetOn").onclick=()=>preset(true);
+$("presetOff").onclick=()=>preset(false);
+$("pause").onclick=()=>{ S.running=!S.running; renderClock(); };
+$("clearLog").onclick=()=>{ S.log=[]; renderLog(); };
+$("copyLog").onclick=async()=>{
+  const txt=["Tijd\tWie\tGebeurtenis\tResultaat"].concat(S.log.slice().reverse().map(l=>[fmt(l.t),l.who,l.what,RES[l.res][1]].join("\t"))).join("\n");
+  const b=$("copyLog");
+  try{ await navigator.clipboard.writeText(txt); b.textContent="Gekopieerd"; }
+  catch(_){ b.textContent="Kopiëren niet toegestaan"; }
+  setTimeout(()=>b.textContent="Kopieer audittrail",1600);
+};
+
+let jitSys=null;
+function openJit(sid){
+  jitSys=sid; const s=SY(sid);
+  $("jitWhat").textContent = U(S.active).name+" vraagt beheerrechten op "+s.name+": "+s.action.toLowerCase()+". Goedkeuring door "+approverFor(S.active).name+".";
+  $("jitTicket").value=""; $("jitOverlay").hidden=false; $("jitReason").focus();
+}
+function closeJit(){ $("jitOverlay").hidden=true; jitSys=null; }
+$("jitCancel").onclick=closeJit;
+$("jitOverlay").addEventListener("click",e=>{ if(e.target.id==="jitOverlay") closeJit(); });
+$("jitForm").addEventListener("submit",e=>{
+  e.preventDefault(); if(!jitSys) return;
+  const r={id:S.nid++, user:S.active, sys:jitSys, reason:$("jitReason").value, ticket:$("jitTicket").value.trim(), dur:+$("jitDur").value, t:S.clock};
+  S.reqs.push(r);
+  log(U(S.active).name,"JIT aangevraagd: "+SY(jitSys).name+" ("+r.reason+(r.ticket?", "+r.ticket:"")+", "+r.dur+" min)","warn");
+  closeJit(); live();
+});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !$("jitOverlay").hidden) closeJit(); });
+
+setInterval(()=>{
+  if(!S.running) return;
+  S.clock++;
+  S.grants.forEach(g=>{ if(g.until===S.clock) log(U(g.user).name,"JIT-sessie "+SY(g.sys).name+" verlopen; rechten automatisch ingetrokken","info"); });
+  S.grants=S.grants.filter(g=>g.until>S.clock);
+  live();
+},1000);
+
+/* Startsituatie (voorbeeld) */
+log("Lisa Bakker","Ingelogd op werkplek","info");
+log("Lisa Bakker","JIT aangevraagd: Backupserver (Gepland onderhoud, CHG-1038, 30 min)","warn");
+log("Peter Visser","JIT goedgekeurd: Lisa Bakker → Backupserver voor 30 min","ok");
+S.grants.push({id:S.nid++, user:"lisa", sys:"backup", until:S.clock+25, dur:30});
+S.reqs.push({id:S.nid++, user:"ahmed", sys:"mescfg", reason:"Gepland onderhoud", ticket:"CHG-1042", dur:30, t:S.clock});
+log("Ahmed Yilmaz","JIT aangevraagd: MES-beheer (Gepland onderhoud, CHG-1042, 30 min)","warn");
+log("Sanne de Vries","Ingelogd op werkplek","info");
+all();
+</script>
+</body>
+</html>
