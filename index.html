@@ -60,7 +60,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
 .seg button{border:0;background:transparent;padding:6px 12px;font-weight:500}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
-.principles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.principles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .pr{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:8px;background:var(--sunk);border:1px solid transparent}
 .pr.on{border-color:var(--accent);background:var(--accent-soft)}
 .pr div{min-width:0}
@@ -96,6 +96,24 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .chip.bad{color:var(--bad);background:var(--bad-soft)}
 .chip.off{color:var(--off);background:var(--off-soft)}
 
+/* Accountkiezer */
+.picker{display:flex;flex-direction:column;gap:8px}
+.picker select,.picker input[type=search]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px;width:100%}
+.users{max-height:300px;overflow:auto;padding-right:2px}
+.avatar.code{font-family:var(--mono);font-size:10.5px;width:38px;border-radius:6px}
+.count{font-size:12.5px;color:var(--muted)}
+/* Overzicht */
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kpi{background:var(--sunk);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi .num{font-size:24px;font-weight:600;line-height:1.1}
+.kpi small{color:var(--muted);font-size:12.5px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+#overview tr{cursor:pointer}
+#overview tr:hover td{background:var(--sunk)}
+#overview tr.cur td{background:var(--accent-soft)}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.task{color:var(--muted);font-size:12.5px;min-width:220px}
+@media (max-width:760px){.kpis{grid-template-columns:minmax(0,1fr)}}
 /* Blast radius */
 .blast{background:var(--sunk);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
 .blast .num{font-size:26px;font-weight:600;line-height:1}
@@ -153,17 +171,42 @@ td.r{white-space:nowrap}
 .dialog .acts{display:flex;gap:8px;justify-content:flex-end}
 
 @media (max-width:1100px){.grid{grid-template-columns:260px minmax(0,1fr)}.side{grid-column:1/-1}}
-@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}.principles{grid-template-columns:repeat(2,minmax(0,1fr))}.trace li{grid-template-columns:1fr}}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}.principles{grid-template-columns:minmax(0,1fr)}.trace li{grid-template-columns:1fr}}
 @media (max-width:440px){.principles{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tabs button{border:0;background:transparent;padding:10px 14px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs button:hover{color:var(--ink)}
+.view{display:flex;flex-direction:column;gap:0}
+/* Managersomgeving */
+.sources{display:flex;flex-wrap:wrap;gap:6px}
+.src{font-family:var(--mono);font-size:12px;padding:3px 8px;border:1px dashed var(--muted);border-radius:5px;color:var(--muted)}
+.findings{display:flex;flex-direction:column;gap:8px}
+.finding{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;padding:12px;border-radius:8px;background:var(--sunk);border-left:3px solid var(--bad)}
+.finding.ok{border-left-color:var(--ok)}
+.finding strong{display:block;margin-bottom:2px}
+.finding .chip{margin-top:2px;min-width:78px;justify-content:center}
+.filters{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.filters input[type=search],.filters select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 9px;min-width:0}
+.filters input[type=search]{flex:1 1 220px}
+.filters select:disabled{opacity:.5}
+.filters .switch:disabled{opacity:.4;cursor:default}
+#crit tr.cur td{background:var(--accent-soft)}
+#crit tr[data-crit]:hover td{background:var(--sunk)}
+td.grp{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:200px}
+.pager{display:flex;gap:10px;align-items:center;justify-content:flex-end}
+#viewSim .grid{margin-top:16px}
+#viewMgr > .panel:first-child{margin-top:16px}
 </style>
 </head>
 <body>
-
 <div class="wrap">
   <header class="top">
     <div class="intro">
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h1 id="orgTitle">PAM-simulator</h1><span class="chip warn">Template · voorbeelddata</span></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h1 id="orgTitle">PAM-simulator</h1><span class="chip warn">In opbouw · systemen nog generiek</span></div>
       <p class="muted" id="orgDesc"></p>
     </div>
     <div class="clock">
@@ -177,39 +220,137 @@ td.r{white-space:nowrap}
     <div class="policy-head">
       <h2>Beveiligingsbeleid</h2>
       <div class="seg" role="group" aria-label="Scenario">
-        <button type="button" id="presetOff" aria-pressed="false">Huidige situatie (geen PAM)</button>
-        <button type="button" id="presetOn" aria-pressed="true">Advies: volledige PAM</button>
+        <button type="button" id="presetOff" aria-pressed="true">Huidige situatie (geen PAM)</button>
+        <button type="button" id="presetOn" aria-pressed="false">Advies: volledige PAM</button>
       </div>
     </div>
     <div class="principles" id="principles"></div>
   </section>
 
-  <div class="grid">
-    <section class="panel" aria-label="Medewerkers">
-      <h2>Inloggen als</h2>
-      <div class="users" id="users"></div>
-      <div class="session" id="session"></div>
-      <div class="blast" id="blast"></div>
-    </section>
+  <nav class="tabs" role="tablist" aria-label="Weergave">
+    <button type="button" role="tab" id="tabSim" aria-selected="true" aria-controls="viewSim">Simulatie</button>
+    <button type="button" role="tab" id="tabMgr" aria-selected="false" aria-controls="viewMgr">Managersomgeving</button>
+  </nav>
 
-    <section class="panel" aria-label="Systemen">
+  <!-- ===================== SIMULATIE ===================== -->
+  <div id="viewSim" class="view" role="tabpanel" aria-labelledby="tabSim">
+    <div class="grid">
+      <section class="panel" aria-label="Medewerkers">
+        <h2>Inloggen als</h2>
+        <div class="picker">
+          <label for="deptSel" style="font-size:12.5px;font-weight:600">Afdeling</label>
+          <select id="deptSel"></select>
+          <input id="userSearch" type="search" placeholder="Zoek op accountcode, bijv. ITD-0042" autocomplete="off" aria-label="Zoek account">
+          <label class="row-toggle" for="onlyAdm" style="font-size:13px">
+            <input type="checkbox" class="switch" id="onlyAdm">
+            <span>Alleen medewerkers met beheeraccount</span>
+          </label>
+          <span class="count" id="userCount"></span>
+        </div>
+        <div class="users" id="users"></div>
+        <div class="session" id="session"></div>
+        <div class="blast" id="blast"></div>
+      </section>
+
+      <section class="panel" aria-label="Systemen">
+        <div class="panel-head">
+          <h2>Systemen</h2>
+          <span class="muted" id="sysSummary"></span>
+        </div>
+        <div class="systems" id="systems"></div>
+        <div class="trace" id="trace"></div>
+      </section>
+
+      <section class="panel side" aria-label="Just-in-time toegang">
+        <h2>JIT-aanvragen</h2>
+        <div class="list" id="queue"></div>
+        <h2>Actieve beheersessies</h2>
+        <div class="list" id="grants"></div>
+      </section>
+    </div>
+
+    <section class="panel" aria-label="Organisatie-overzicht" style="margin-top:16px">
       <div class="panel-head">
-        <h2>Systemen</h2>
-        <span class="muted" id="sysSummary"></span>
+        <h2>Organisatie-overzicht</h2>
+        <span class="muted" id="ovSummary"></span>
       </div>
-      <div class="systems" id="systems"></div>
-      <div class="trace" id="trace"></div>
-    </section>
-
-    <section class="panel side" aria-label="Just-in-time toegang">
-      <h2>JIT-aanvragen</h2>
-      <div class="list" id="queue"></div>
-      <h2>Actieve beheersessies</h2>
-      <div class="list" id="grants"></div>
+      <div class="kpis" id="kpis"></div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Afdeling</th><th>Code</th><th class="n">Medewerkers</th><th>Taken</th><th class="n">Toegang buiten eigen afdeling</th><th class="n">Beheerders</th><th class="n">Permanente beheerrechten</th><th class="n">Bereikbaar met alleen wachtwoord</th></tr></thead>
+          <tbody id="overview"></tbody>
+        </table>
+      </div>
+      <p class="count">Aantallen zijn medewerkers per afdeling. Klik op een afdeling om daar een account te kiezen.</p>
     </section>
   </div>
 
-  <section class="panel" aria-label="Audittrail">
+  <!-- ===================== MANAGERSOMGEVING ===================== -->
+  <div id="viewMgr" class="view" role="tabpanel" aria-labelledby="tabMgr" hidden>
+    <section class="panel" aria-label="Status inzicht">
+      <div class="panel-head" style="flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+          <h2>Inzicht voor managers</h2>
+          <p id="mgrIntro" style="max-width:75ch"></p>
+        </div>
+        <span id="mgrMode"></span>
+      </div>
+      <div class="sources" id="mgrSources"></div>
+    </section>
+
+    <section class="panel" aria-label="Bevindingen" style="margin-top:16px">
+      <h2>Bevindingen huidige situatie</h2>
+      <div class="findings" id="findings"></div>
+    </section>
+
+    <section class="panel" aria-label="Kritieke applicaties" style="margin-top:16px">
+      <div class="panel-head" style="flex-wrap:wrap">
+        <h2>Wie heeft beheerrechten op bedrijfskritische applicaties?</h2>
+        <span class="muted" id="critNote"></span>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead id="critHead"></thead>
+          <tbody id="crit"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="Accountinventaris" style="margin-top:16px">
+      <div class="panel-head" style="flex-wrap:wrap">
+        <h2>Accountinventaris</h2>
+        <span class="muted" id="invCount"></span>
+      </div>
+      <div class="filters">
+        <input id="invSearch" type="search" placeholder="Zoek account of eigenaar" autocomplete="off" aria-label="Zoek in inventaris">
+        <select id="invType" aria-label="Type account">
+          <option value="">Alle typen</option>
+          <option value="persoonlijk">Persoonlijk</option>
+          <option value="beheer">Beheeraccount</option>
+          <option value="gedeeld">Gedeeld account</option>
+          <option value="service">Serviceaccount</option>
+          <option value="wees">Zonder eigenaar</option>
+        </select>
+        <select id="invSys" aria-label="Systeem"></select>
+        <label class="row-toggle" for="invPriv" style="font-size:13px"><input type="checkbox" class="switch" id="invPriv"><span>Alleen met beheerrechten</span></label>
+        <label class="row-toggle" for="invExcess" style="font-size:13px"><input type="checkbox" class="switch" id="invExcess"><span>Alleen meer dan nodig</span></label>
+      </div>
+      <p class="count" id="invLock"></p>
+      <div class="tablewrap">
+        <table>
+          <thead id="invHead"></thead>
+          <tbody id="inv"></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <button type="button" class="btn small" id="pgPrev">Vorige</button>
+        <span class="count mono" id="pgInfo"></span>
+        <button type="button" class="btn small" id="pgNext">Volgende</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" aria-label="Audittrail" style="margin-top:0">
     <div class="panel-head">
       <h2>Audittrail</h2>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -260,258 +401,518 @@ td.r{white-space:nowrap}
 
 <script>
 /* =====================================================================
-   CONFIGURATIE — vul hier de situatie van de organisatie in.
-   Alles hieronder is generieke voorbeelddata.
+   CONFIGURATIE — situatie van de organisatie. Pas hier aan.
    ===================================================================== */
 const CONFIG = {
   organisatie: "Organisatie X",
-  omschrijving: "Generieke simulatie van een bedrijfsnetwerk. Zet PAM-principes aan of uit, log in als medewerker en zie wie waar bij kan. 1 seconde = 1 minuut simulatietijd.",
+  omschrijving: "Simulatie van een productiebedrijf voor laboratoriumchemicaliën en verbruiksartikelen met 2.500 medewerkers in 10 afdelingen. Start in de huidige situatie, zet PAM-principes aan en zie wat er verandert. 1 seconde = 1 minuut simulatietijd.",
   domein: "organisatie.lab",
+  seed: 20261118,
 
-  // Rollen: sleutel -> weergavenaam
-  roles: {
-    medewerker: "Medewerker",
-    beheer:     "IT-beheerder",
-    extern:     "Externe partij",
-    manager:    "Manager"
-  },
-
-  // Gebruikers. device:false = eigen/onbeheerd apparaat. approver:true = mag JIT-aanvragen goedkeuren.
-  users: [
-    {id:"u1", name:"Gebruiker A", role:"medewerker", device:true},
-    {id:"u2", name:"Gebruiker B", role:"beheer",     device:true,  approver:true},
-    {id:"u3", name:"Gebruiker C", role:"extern",     device:false},
-    {id:"u4", name:"Gebruiker D", role:"manager",    device:true,  approver:true}
+  // Afdelingen. code = prefix van accountcodes. approver = mag JIT-aanvragen goedkeuren.
+  departments: [
+    {key:"productie",  name:"Productie & operaties",    code:"PRD", count:850, device:true, taken:"Reagentia en oplosmiddelen vullen, glazen en kunststof verbruiksartikelen produceren, verpakken, apparatuur onderhouden"},
+    {key:"kwaliteit",  name:"Kwaliteit (QA/QC)",        code:"QAC", count:320, device:true, taken:"Inkomende en uitgaande controles, zuiverheidsbepalingen, steriliteitstesten, batchvrijgave, documentatie"},
+    {key:"supply",     name:"Supply chain & logistiek", code:"SCL", count:300, device:true, taken:"Inkoop, voorraad, magazijn, verzending, geconditioneerd transport (koelketen)"},
+    {key:"rnd",        name:"R&D & techniek",           code:"RND", count:280, device:true, taken:"Formulatie, productontwikkeling, applicatieondersteuning, referentiematerialen"},
+    {key:"verkoop",    name:"Verkoop & marketing",      code:"VKM", count:250, device:true, taken:"Binnendienst, buitendienst, accountmanagement, key accounts bij labketens en farma"},
+    {key:"finance",    name:"Finance & administratie",  code:"FIN", count:180, device:true, taken:"Boekhouding, controlling, facturatie, inkoopadministratie"},
+    {key:"it",         name:"IT & digital",             code:"ITD", count:130, device:true, taken:"Infrastructuur, applicatiebeheer, support, data en beveiliging"},
+    {key:"hr",         name:"HR & facilities",          code:"HRF", count:90,  device:true, taken:"Personeelszaken, payroll, huisvesting, beveiliging van het terrein"},
+    {key:"regulatory", name:"Regulatory & EHS",         code:"REG", count:60,  device:true, taken:"Wetgeving en certificeringen (ISO, GMP-achtige eisen), milieu, veiligheid, gevaarlijke stoffen"},
+    {key:"directie",   name:"Directie & management",    code:"DIR", count:40,  device:true, approver:true, taken:"Bedrijfsleiding, afdelingshoofden, strategie"}
   ],
 
-  // Systemen. kind: "normaal" (dagelijks gebruik) of "bevoorrecht" (beheertaak).
-  // roles: welke rollen dit systeem volgens het beleid mogen gebruiken/beheren.
+  // Systemen. kind "normaal" = dagelijks gebruik, "bevoorrecht" = beheertaak. kritiek = bedrijfskritisch.
+  // roles = welke afdelingen het systeem voor hun werk nodig hebben (gebruikt door Least privilege). group = naam van de AD-groep (huidige situatie).
   systems: [
-    {id:"app",   name:"Bedrijfsapplicatie", full:"Kernapplicatie (nog invullen)", action:"Dagelijkse taak uitvoeren",       kind:"normaal",     roles:["medewerker","manager"]},
-    {id:"files", name:"Fileserver",         full:"Gedeelde bestanden",           action:"Afdelingsmap openen",             kind:"normaal",     roles:["medewerker","manager"]},
-    {id:"appadm",name:"Applicatiebeheer",   full:"Kernapplicatie (nog invullen)", action:"Configuratie wijzigen",           kind:"bevoorrecht", roles:["beheer","extern"]},
-    {id:"dc",    name:"Domain Controller",  full:"DC01",                          action:"Gebruikers en groepen beheren",   kind:"bevoorrecht", roles:["beheer"]},
-    {id:"fw",    name:"Firewall",           full:"FW01",                          action:"Firewallregels wijzigen",         kind:"bevoorrecht", roles:["beheer"]}
-  ]
+    {id:"app",    name:"Bedrijfsapplicatie", full:"Kernapplicatie (nog invullen)", action:"Dagelijkse taak uitvoeren",       kind:"normaal",     kritiek:true,  group:"APP_Users",       roles:["productie","kwaliteit","supply","rnd","verkoop","finance","it","hr","regulatory","directie"]},
+    {id:"files",  name:"Fileserver",         full:"Gedeelde bestanden",           action:"Afdelingsmap openen",             kind:"normaal",     kritiek:false, group:"FS_Afdeling_RW",  roles:["productie","kwaliteit","supply","rnd","verkoop","finance","it","hr","regulatory","directie"]},
+    {id:"fin",    name:"Financieel systeem", full:"Boekhouding en facturatie",    action:"Facturen en boekingen inzien",    kind:"normaal",     kritiek:true,  group:"FIN_Users",       roles:["finance","directie"]},
+    {id:"hrsys",  name:"HR-systeem",         full:"Personeel en payroll",         action:"Personeelsdossier openen",        kind:"normaal",     kritiek:false, group:"HR_App",          roles:["hr","directie"]},
+    {id:"appadm", name:"Applicatiebeheer",   full:"Beheer kernapplicatie",        action:"Configuratie wijzigen",           kind:"bevoorrecht", kritiek:true,  group:"APP_Admin"},
+    {id:"db",     name:"Databaseserver",     full:"DB01",                          action:"Database-instellingen wijzigen",  kind:"bevoorrecht", kritiek:true,  group:"SQL_sysadmin"},
+    {id:"dc",     name:"Domain Controller",  full:"DC01",                          action:"Gebruikers en groepen beheren",   kind:"bevoorrecht", kritiek:true,  group:"Domain Admins"},
+    {id:"fw",     name:"Firewall",           full:"FW01",                          action:"Firewallregels wijzigen",         kind:"bevoorrecht", kritiek:true,  group:"FW_Admin"},
+    {id:"backup", name:"Backupserver",       full:"BCK01",                         action:"Back-up terugzetten",             kind:"bevoorrecht", kritiek:true,  group:"Backup Operators"}
+  ],
+
+  // Beheerprofielen: welke beheerrechten een functie écht nodig heeft.
+  profiles: {
+    infra:    {name:"Infrastructuurbeheer", needed:["dc","fw","backup"]},
+    app:      {name:"Applicatiebeheer",     needed:["appadm","db"]},
+    support:  {name:"Servicedesk",          needed:["dc"]},
+    security: {name:"Security",             needed:["fw"]},
+    keyuser:  {name:"Key-user applicatie",  needed:["appadm"]}
+  },
+  // Wie er een (persoonlijk) beheeraccount heeft. Samen 100 beheerders.
+  beheerders: [
+    {dept:"it", profile:"infra", n:20}, {dept:"it", profile:"app", n:18}, {dept:"it", profile:"support", n:22}, {dept:"it", profile:"security", n:6},
+    {dept:"productie", profile:"keyuser", n:12}, {dept:"kwaliteit", profile:"keyuser", n:8}, {dept:"rnd", profile:"keyuser", n:8},
+    {dept:"supply", profile:"keyuser", n:4}, {dept:"finance", profile:"keyuser", n:2}
+  ],
+  aandeelTeveelRechten: 0.81,   // 81% van de beheerders heeft meer rechten dan nodig
+  aandeelLokaleAdmin: 0.12,     // deel medewerkers met lokale beheerrechten op de werkplek
+  aandeelRechtenBuitenRol: 0.08,// deel medewerkers met opgestapelde rechten buiten hun afdeling
+  gedeeld: [
+    {id:"admin",         rights:["dc","fw","backup","db","appadm"], bron:"Lokaal op server"},
+    {id:"beheer01",      rights:["dc","appadm"], bron:"Excel IT"},
+    {id:"beheer02",      rights:["dc","db"], bron:"Excel IT"},
+    {id:"itsupport",     rights:["dc"], bron:"AD-export"},
+    {id:"leverancier",   rights:["appadm","db"], bron:"Excel IT"},
+    {id:"scanner-admin", rights:["dc","fw"], bron:"Lokaal op server"}
+  ],
+  service: [
+    {id:"svc_backup",  rights:["backup","db","dc"],  needed:["backup"]},
+    {id:"svc_app",     rights:["appadm","db","dc"],  needed:["appadm","db"]},
+    {id:"svc_sql",     rights:["db"],                needed:["db"]},
+    {id:"svc_monitor", rights:["dc","fw"],           needed:[]},
+    {id:"svc_scan",    rights:["dc"],                needed:[]}
+  ],
+  verweesd: 14  // beheeraccounts van oud-medewerkers die nooit zijn opgeruimd
 };
 /* ===================================================================== */
 
-const ROLES = CONFIG.roles;
-const USERS = CONFIG.users;
-const SYSTEMS = CONFIG.systems;
+/* ---------- Data genereren (deterministisch) ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=mulberry32(CONFIG.seed);
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const DEPTS=CONFIG.departments, SYSTEMS=CONFIG.systems, PROFILES=CONFIG.profiles;
+const ROLES=Object.fromEntries(DEPTS.map(d=>[d.key,d.name]));
+const NORMAL=SYSTEMS.filter(s=>s.kind==="normaal"), PRIVS=SYSTEMS.filter(s=>s.kind==="bevoorrecht").map(s=>s.id);
+const dateStr=(y,m,d)=>y+"-"+String(m).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+const recent=()=>{const m=pick([10,11]);return dateStr(2026,m,1+Math.floor(rnd()*(m===11?17:31)));};
+
+const USERS = DEPTS.flatMap(d=>Array.from({length:d.count},(_,i)=>{
+  const id=d.code+"-"+String(i+1).padStart(4,"0");
+  const rights=new Set(NORMAL.filter(s=>s.roles.includes(d.key)).map(s=>s.id));
+  if(rnd()<CONFIG.aandeelRechtenBuitenRol) rights.add(pick(NORMAL.filter(s=>!s.roles.includes(d.key)).map(s=>s.id).concat(["fin"])));
+  return {id, name:id, role:d.key, device:d.device, approver:!!d.approver, rights, localAdmin:rnd()<CONFIG.aandeelLokaleAdmin, last:recent(), adm:null};
+}));
+const UMAP=new Map(USERS.map(u=>[u.id,u]));
+
+const PRIV=[];
+const pats=[c=>"adm-"+c, c=>c+"-adm", c=>c.replace("-","").toLowerCase()+"_a", c=>"beheer."+c.toLowerCase(), c=>"a-"+c];
+const pools={};
+DEPTS.forEach(d=>pools[d.key]=shuffle(USERS.filter(u=>u.role===d.key)));
+CONFIG.beheerders.forEach(g=>{
+  for(let k=0;k<g.n;k++){
+    const u=pools[g.dept].shift(); if(!u) break;
+    const needed=PROFILES[g.profile].needed.slice();
+    const acc={id:pick(pats)(u.id), type:"beheer", owner:u.id, dept:u.role, profile:g.profile, needed, actual:needed.slice(),
+      bron:rnd()<.7?"AD-export":"Excel IT", ownerKnown:rnd()<.6, last:recent()};
+    u.adm=acc; PRIV.push(acc);
+  }
+});
+const admins=shuffle(PRIV.slice());
+const nExcess=Math.round(admins.length*CONFIG.aandeelTeveelRechten);
+admins.slice(0,nExcess).forEach(a=>{
+  const extra=shuffle(PRIVS.filter(x=>!a.needed.includes(x))).slice(0,1+Math.floor(rnd()*3));
+  if(!a.needed.includes("dc") && !extra.includes("dc") && rnd()<.5) extra.push("dc");
+  a.actual=PRIVS.filter(x=>a.needed.includes(x)||extra.includes(x));
+});
+CONFIG.gedeeld.forEach(g=>PRIV.push({id:g.id, type:"gedeeld", owner:null, dept:null, needed:[], actual:g.rights.slice(), bron:g.bron, ownerKnown:false, last:recent()}));
+CONFIG.service.forEach(s=>PRIV.push({id:s.id, type:"service", owner:null, dept:"it", needed:s.needed.slice(), actual:s.rights.slice(), bron:"AD-export", ownerKnown:false, last:recent()}));
+for(let k=0;k<CONFIG.verweesd;k++){
+  const d=pick(DEPTS.filter(x=>["it","productie","kwaliteit","rnd"].includes(x.key)));
+  const code=d.code+"-"+String(d.count+1+Math.floor(rnd()*60)).padStart(4,"0");
+  PRIV.push({id:pick(pats)(code), type:"wees", owner:null, dept:null, needed:[], actual:shuffle(PRIVS.slice()).slice(0,1+Math.floor(rnd()*3)), bron:"AD-export", ownerKnown:false, last:dateStr(pick([2024,2025]),1+Math.floor(rnd()*12),1+Math.floor(rnd()*28))});
+}
+const ALL_ACCOUNTS = USERS.length + PRIV.length;
+const MESSY_ORDER = shuffle(USERS.map(u=>({k:"u",x:u})).concat(PRIV.map(p=>({k:"p",x:p}))));
+const TYPE_LABEL={persoonlijk:"Persoonlijk", beheer:"Beheeraccount", gedeeld:"Gedeeld account", service:"Serviceaccount", wees:"Zonder eigenaar"};
+
 const PRINCIPLES = [
-  {k:"rbac", name:"Role based acces control", desc:"Toegang hangt af van je rol, niet van wie je bent."},
-  {k:"polp", name:"Least privilege", desc:"Alleen beheerrechten die bij je taak horen."},
+  {k:"polp", name:"Least privilege", desc:"Alleen rechten die bij je functie horen; overbodige rechten en accounts weg."},
   {k:"jit",  name:"Just-in-time", desc:"Beheerrechten alleen tijdelijk, na goedkeuring."},
   {k:"zt",   name:"Zero Trust", desc:"Elke keer MFA en een veilig apparaat controleren."}
 ];
 
 const S = {
-  p:{rbac:true,polp:true,jit:true,zt:true},
-  active:USERS[0].id,
-  mfa:Object.fromEntries(USERS.map(u=>[u.id,true])),
-  jump:Object.fromEntries(USERS.map(u=>[u.id,false])),
-  reqs:[], grants:[], log:[], clock:8*60, running:true, sel:SYSTEMS[0].id, nid:1
+  p:{polp:false,jit:false,zt:false},
+  active:"", mfa:{}, jump:{},
+  reqs:[], grants:[], log:[], clock:8*60, running:true, sel:"dc", nid:1,
+  dept:"it", q:"", onlyAdm:false,
+  view:"sim", inv:{q:"",type:"",sys:"",priv:false,excess:false,page:0}
 };
-const $ = id => document.getElementById(id);
-const U = id => USERS.find(u=>u.id===id);
-const SY = id => SYSTEMS.find(s=>s.id===id);
-const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fmt = m => { m=((m%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0"); };
-const initials = n => n.split(" ").filter(w=>w[0]===w[0].toUpperCase()).map(w=>w[0]).slice(0,2).join("");
+S.active = (USERS.find(u=>u.role==="it" && u.adm && u.adm.actual.length>u.adm.needed.length)||USERS[0]).id;
 
-function log(who, what, res){ S.log.unshift({t:S.clock, who, what, res}); if(S.log.length>300) S.log.pop(); }
-function grantFor(uid, sid){ return S.grants.find(g=>g.user===uid && g.sys===sid && g.until>S.clock); }
-function approverFor(uid){ return USERS.find(u=>u.approver && u.id!==uid) || {name:"Beheerder"}; }
+const $=id=>document.getElementById(id);
+const U=id=>UMAP.get(id);
+const SY=id=>SYSTEMS.find(s=>s.id===id);
+const D=key=>DEPTS.find(d=>d.key===key);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=m=>{m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")};
+const nl=n=>n.toLocaleString("nl-NL");
+const mfaOf=id=>S.mfa[id]!==false;
+const jumpOf=id=>!!S.jump[id];
 
-function decide(u, s, ctx, p){
+function log(who,what,res){ S.log.unshift({t:S.clock,who,what,res}); if(S.log.length>300) S.log.pop(); }
+function grantFor(uid,sid){ return S.grants.find(g=>g.user===uid&&g.sys===sid&&g.until>S.clock); }
+function approverFor(uid){ return USERS.find(u=>u.approver&&u.id!==uid)||{name:"Directie"}; }
+
+/* Effectieve beheerrechten van een bevoorrecht account onder beleid p */
+function effPriv(a,p){
+  if(!p.polp) return {sys:a.actual, mode:"permanent"};
+  if(a.type==="gedeeld"||a.type==="wees") return {sys:[], mode:"uit"};
+  if(a.type==="service") return {sys:a.needed, mode:a.needed.length?"kluis":"geen"};
+  return {sys:a.needed, mode:p.jit?"jit":"permanent"};
+}
+const excessOf=(a,p)=>effPriv(a,p).sys.filter(x=>!a.needed.includes(x));
+
+/* ---------- Beslisregel ---------- */
+function decide(u,s,ctx,p){
   const tr=[];
   if(p.zt){
     if(!ctx.mfa){ tr.push({k:"Zero Trust",st:"bad",txt:"Geen MFA-bevestiging in deze sessie. Een wachtwoord alleen is niet genoeg."}); return {res:"deny",tr}; }
     if(!ctx.device){ tr.push({k:"Zero Trust",st:"bad",txt:"Apparaat is niet beheerd door "+CONFIG.organisatie+". Verbind via de PAM-jumphost."}); return {res:"deny",tr}; }
     tr.push({k:"Zero Trust",st:"ok",txt:"MFA bevestigd en apparaat "+(u.device?"beheerd door "+CONFIG.organisatie+".":"via de PAM-jumphost.")});
-  } else tr.push({k:"Zero Trust",st:"off",txt:"Uit: identiteit en apparaat worden niet gecontroleerd."});
+  } else tr.push({k:"Zero Trust",st:"off",txt:"Uit: alleen gebruikersnaam en wachtwoord, apparaat wordt niet gecontroleerd."});
 
   if(s.kind==="normaal"){
-    if(p.rbac){
-      if(s.roles.includes(u.role)) tr.push({k:"RBAC",st:"ok",txt:"Rol "+ROLES[u.role]+" is gemachtigd voor dit systeem."});
-      else { tr.push({k:"RBAC",st:"bad",txt:"Rol "+ROLES[u.role]+" hoort niet bij dit systeem."}); return {res:"deny",tr}; }
-    } else tr.push({k:"RBAC",st:"warn",txt:"Uit: elke medewerker kan dit systeem gebruiken."});
-    tr.push({k:"PoLP / JIT",st:"off",txt:"Niet van toepassing: dit is normaal gebruik, geen beheertaak."});
-    return {res:"allow",tr};
+    if(p.polp){
+      if(u.rights.has(s.id) && s.roles.includes(u.role)) { tr.push({k:"Least privilege",st:"ok",txt:"Medewerkers van "+ROLES[u.role]+" hebben dit systeem nodig voor hun werk."}); return {res:"allow",tr}; }
+      tr.push({k:"Least privilege",st:"bad",txt:u.rights.has(s.id)?"Opgestapeld recht ingetrokken: "+ROLES[u.role]+" heeft dit systeem niet nodig.":"Dit account heeft geen recht op dit systeem."}); return {res:"deny",tr};
+    }
+    if(u.rights.has(s.id)){
+      const out=!s.roles.includes(u.role);
+      tr.push({k:"Rechten",st:out?"warn":"ok",txt:out?"Los toegekend recht dat niet bij de afdeling past (opgestapeld, nooit ingetrokken).":"Recht los toegekend aan dit account (geen rolmodel)."});
+      return {res:"allow",tr};
+    }
+    tr.push({k:"Rechten",st:"bad",txt:"Dit account heeft geen recht op dit systeem."}); return {res:"deny",tr};
   }
-  if(p.polp){
-    if(s.roles.includes(u.role)) tr.push({k:"Least privilege",st:"ok",txt:"Rol "+ROLES[u.role]+" mag deze beheertaak uitvoeren."});
-    else { tr.push({k:"Least privilege",st:"bad",txt:"Rol "+ROLES[u.role]+" heeft geen beheerrechten op dit systeem."}); return {res:"deny",tr}; }
-  } else {
-    tr.push({k:"Least privilege",st:"warn",txt:"Uit: iedereen heeft beheerrechten op alle systemen."});
-    tr.push({k:"Just-in-time",st:"off",txt:"Niet relevant: rechten zijn al permanent toegekend."});
-    return {res:"allow",tr};
+  const a=u.adm;
+  if(!p.polp){
+    if(a && a.actual.includes(s.id)){
+      const extra=!a.needed.includes(s.id);
+      tr.push({k:"Least privilege",st:"warn",txt:"Uit: permanent beheerrecht via account "+a.id+(extra?". Dit recht is niet nodig voor de functie "+PROFILES[a.profile].name+".":".")});
+      tr.push({k:"Just-in-time",st:"off",txt:"Niet actief: beheerrechten staan altijd aan (standing privilege)."});
+      return {res:"allow",tr};
+    }
+    tr.push({k:"Beheerrechten",st:"bad",txt:a?"Beheeraccount "+a.id+" heeft geen rechten op dit systeem.":"Deze medewerker heeft geen beheeraccount."}); return {res:"deny",tr};
   }
+  if(!(a && a.needed.includes(s.id))){
+    tr.push({k:"Least privilege",st:"bad",txt:a?"Functie "+PROFILES[a.profile].name+" heeft dit systeem niet nodig.":"Deze medewerker heeft geen beheertaak."}); return {res:"deny",tr};
+  }
+  tr.push({k:"Least privilege",st:"ok",txt:"Functie "+PROFILES[a.profile].name+" heeft dit beheerrecht nodig."});
   if(p.jit){
-    const g = ctx.grants && grantFor(u.id, s.id);
+    const g=ctx.grants&&grantFor(u.id,s.id);
     if(g){ tr.push({k:"Just-in-time",st:"ok",txt:"JIT-sessie actief, verloopt over "+(g.until-S.clock)+" min."}); return {res:"allow",tr,g}; }
-    tr.push({k:"Just-in-time",st:"warn",txt:"Geen actieve sessie. Vraag tijdelijke rechten aan; IT keurt goed."});
-    return {res:"jit",tr};
+    tr.push({k:"Just-in-time",st:"warn",txt:"Geen actieve sessie. Vraag tijdelijke rechten aan; directie keurt goed."}); return {res:"jit",tr};
   }
-  tr.push({k:"Just-in-time",st:"warn",txt:"Uit: beheerrechten staan permanent aan (standing privilege)."});
-  return {res:"allow",tr};
+  tr.push({k:"Just-in-time",st:"warn",txt:"Uit: beheerrecht staat permanent aan."}); return {res:"allow",tr};
 }
-function ctxFor(u){ return {mfa:S.mfa[u.id], device:u.device||S.jump[u.id], grants:true}; }
+const ctxFor=u=>({mfa:mfaOf(u.id), device:u.device||jumpOf(u.id), grants:true});
+const STOLEN={mfa:false,device:false,grants:true};
+const FULL={mfa:true,device:true,grants:false};
+const countAllow=(u,p)=>SYSTEMS.filter(s=>decide(u,s,STOLEN,p).res==="allow");
 
-/* ---------- Render ---------- */
+/* ---------- Render: beleid & tabs ---------- */
 function renderPolicy(){
-  $("principles").innerHTML = PRINCIPLES.map(pr=>`
+  $("principles").innerHTML=PRINCIPLES.map(pr=>`
     <label class="pr ${S.p[pr.k]?"on":""}" for="p_${pr.k}">
       <input type="checkbox" class="switch" id="p_${pr.k}" data-k="${pr.k}" ${S.p[pr.k]?"checked":""}>
       <div><strong>${pr.name}</strong><small>${pr.desc}</small></div>
     </label>`).join("");
-  const all = Object.values(S.p).every(Boolean), none = Object.values(S.p).every(v=>!v);
-  $("presetOn").setAttribute("aria-pressed", all); $("presetOff").setAttribute("aria-pressed", none);
+  const v=Object.values(S.p);
+  $("presetOn").setAttribute("aria-pressed",v.every(Boolean)); $("presetOff").setAttribute("aria-pressed",v.every(x=>!x));
 }
+function setView(v){
+  S.view=v;
+  $("viewSim").hidden=v!=="sim"; $("viewMgr").hidden=v!=="mgr";
+  $("tabSim").setAttribute("aria-selected",v==="sim"); $("tabMgr").setAttribute("aria-selected",v==="mgr");
+  try{ history.replaceState(null,"",v==="mgr"?"#manager":location.pathname+location.search); }catch(_){}
+  if(v==="mgr") renderManager();
+}
+
+/* ---------- Render: simulatie ---------- */
 function renderUsers(){
-  $("users").innerHTML = USERS.map(u=>`
+  const sel=$("deptSel");
+  if(!sel.options.length) sel.innerHTML=DEPTS.map(d=>`<option value="${d.key}">${esc(d.name)} (${d.count})</option>`).join("");
+  sel.value=S.dept;
+  const q=S.q.trim().toUpperCase();
+  let list=q?USERS.filter(u=>u.id.includes(q)):USERS.filter(u=>u.role===S.dept);
+  if(S.onlyAdm) list=list.filter(u=>u.adm);
+  $("userCount").textContent=list.length+(q?" resultaten":" accounts")+(S.onlyAdm?" met beheeraccount":q?"":" in deze afdeling");
+  $("users").innerHTML=list.map(u=>`
     <button type="button" class="user" data-u="${u.id}" aria-pressed="${u.id===S.active}">
-      <span class="avatar">${initials(u.name)}</span>
-      <span class="who"><b>${esc(u.name)}</b><span>${ROLES[u.role]}</span></span>
-    </button>`).join("");
+      <span class="avatar code">${esc(D(u.role).code)}</span>
+      <span class="who"><b class="mono">${esc(u.id)}</b><span>${esc(ROLES[u.role])}${u.adm?" · beheerder":""}${u.approver?" · goedkeurder":""}</span></span>
+    </button>`).join("")||`<p class="empty">Geen accounts gevonden.</p>`;
 }
 function renderSession(){
   const u=U(S.active);
-  $("session").innerHTML = `
+  $("session").innerHTML=`
     <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
-      <h2>Sessie</h2>
+      <h2>Sessie <span class="mono" style="text-transform:none;letter-spacing:0;color:var(--ink)">${esc(u.id)}</span></h2>
       <span class="chip ${u.device?"ok":"warn"}">${u.device?"Beheerd apparaat":"Eigen laptop"}</span>
     </div>
+    ${u.adm?`<p class="count">Beheeraccount <b class="mono">${esc(u.adm.id)}</b> · functie ${esc(PROFILES[u.adm.profile].name)}</p>`:""}
     <label class="row-toggle" for="mfaT">
-      <input type="checkbox" class="switch" id="mfaT" ${S.mfa[u.id]?"checked":""}>
+      <input type="checkbox" class="switch" id="mfaT" ${mfaOf(u.id)?"checked":""}>
       <span>MFA bevestigd<small>Code uit de authenticator-app ingevoerd.</small></span>
     </label>
     <label class="row-toggle" for="jumpT">
-      <input type="checkbox" class="switch" id="jumpT" ${S.jump[u.id]?"checked":""} ${u.device?"disabled":""}>
+      <input type="checkbox" class="switch" id="jumpT" ${jumpOf(u.id)?"checked":""} ${u.device?"disabled":""}>
       <span>Via PAM-jumphost<small>${u.device?"Niet nodig: apparaat is al beheerd.":"Beheerde tussenserver; sessie wordt opgenomen."}</small></span>
     </label>`;
 }
-function countAllow(u, p){
-  const ctx={mfa:false, device:false, grants:true};
-  return SYSTEMS.filter(s=>decide(u,s,ctx,p).res==="allow");
-}
 function renderBlast(){
   const u=U(S.active), n=SYSTEMS.length;
-  const now=countAllow(u,S.p), base=countAllow(u,{rbac:false,polp:false,jit:false,zt:false});
-  $("blast").innerHTML = `
+  const now=countAllow(u,S.p), base=countAllow(u,{polp:false,jit:false,zt:false});
+  $("blast").innerHTML=`
     <h2>Als dit account gehackt wordt</h2>
-    <p style="font-size:12.5px" class="muted">Aanvaller heeft het wachtwoord van ${esc(u.name)} via phishing, maar geen MFA-telefoon en geen bedrijfslaptop.</p>
+    <p style="font-size:12.5px" class="muted">Aanvaller heeft het wachtwoord van ${esc(u.id)} via phishing, maar geen MFA-telefoon en geen bedrijfslaptop.</p>
     <div style="display:flex;align-items:baseline;gap:6px"><span class="num mono">${now.length}</span><span class="muted">van ${n} systemen bereikbaar</span></div>
     <div class="blast-row"><div class="lbl"><span>Huidige instellingen</span><span class="mono">${now.length}/${n}</span></div><div class="bar"><i style="width:${now.length/n*100}%"></i></div></div>
-    <div class="blast-row"><div class="lbl"><span>Zonder PAM</span><span class="mono">${base.length}/${n}</span></div><div class="bar base"><i style="width:${base.length/n*100}%"></i></div></div>
+    <div class="blast-row"><div class="lbl"><span>Huidige situatie</span><span class="mono">${base.length}/${n}</span></div><div class="bar base"><i style="width:${base.length/n*100}%"></i></div></div>
     ${now.length?`<p style="font-size:12.5px">Bereikbaar: ${now.map(s=>esc(s.name)+(s.kind==="bevoorrecht"?" (beheer)":"")).join(", ")}</p>`:`<p style="font-size:12.5px">Niets bereikbaar met alleen het wachtwoord.</p>`}`;
 }
-const STATUS = {allow:["ok","Toegang"], jit:["warn","JIT nodig"], deny:["bad","Geweigerd"]};
+const STATUS={allow:["ok","Toegang"],jit:["warn","JIT nodig"],deny:["bad","Geweigerd"]};
 function renderSystems(){
   const u=U(S.active); let ok=0;
-  $("systems").innerHTML = SYSTEMS.map(s=>{
+  $("systems").innerHTML=SYSTEMS.map(s=>{
     const d=decide(u,s,ctxFor(u),S.p); if(d.res==="allow") ok++;
     const [cls,label]=STATUS[d.res];
     const pending=S.reqs.find(r=>r.user===u.id&&r.sys===s.id);
     let btn;
     if(d.res==="allow") btn=`<button type="button" class="btn small primary" data-open="${s.id}">Openen</button>`;
-    else if(d.res==="jit") btn= pending?`<button type="button" class="btn small" disabled>Wacht op goedkeuring</button>`:`<button type="button" class="btn small" data-jit="${s.id}">JIT aanvragen</button>`;
+    else if(d.res==="jit") btn=pending?`<button type="button" class="btn small" disabled>Wacht op goedkeuring</button>`:`<button type="button" class="btn small" data-jit="${s.id}">JIT aanvragen</button>`;
     else btn=`<button type="button" class="btn small" data-open="${s.id}">Probeer toegang</button>`;
     return `<div class="sys ${S.sel===s.id?"sel":""}" data-sel="${s.id}" tabindex="0" role="button" aria-label="${esc(s.name)}: details tonen">
       <div class="sys-top"><div><div class="sys-name">${esc(s.name)}</div><div class="sys-full">${esc(s.full)}</div></div>
       <span class="chip ${cls}">${d.g?"JIT · "+(d.g.until-S.clock)+" min":label}</span></div>
-      <div class="kind ${s.kind==="bevoorrecht"?"priv":""}">${s.kind==="bevoorrecht"?"Beheertaak":"Normaal gebruik"}</div>
+      <div class="kind ${s.kind==="bevoorrecht"?"priv":""}">${s.kind==="bevoorrecht"?"Beheertaak":"Normaal gebruik"}${s.kritiek?" · kritiek":""}</div>
       <div class="sys-action">${esc(s.action)}</div>
       <div class="sys-foot">${btn}</div></div>`;
   }).join("");
-  $("sysSummary").textContent = ok+" van "+SYSTEMS.length+" toegankelijk voor "+u.name;
+  $("sysSummary").textContent=ok+" van "+SYSTEMS.length+" toegankelijk voor "+u.id;
 }
 function renderTrace(){
-  const u=U(S.active), s=SY(S.sel);
-  if(!s){ $("trace").innerHTML=""; return; }
+  const u=U(S.active), s=SY(S.sel); if(!s){ $("trace").innerHTML=""; return; }
   const d=decide(u,s,ctxFor(u),S.p), [cls,label]=STATUS[d.res];
-  $("trace").innerHTML = `
+  $("trace").innerHTML=`
     <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center">
-      <h2>Beslissing: ${esc(u.name)} → ${esc(s.name)}</h2>
-      <span class="chip ${cls} verdict">${label}</span>
+      <h2>Beslissing: ${esc(u.id)} → ${esc(s.name)}</h2><span class="chip ${cls} verdict">${label}</span>
     </div>
     <ol>${d.tr.map(t=>`<li class="${t.st}"><b>${t.k}</b><span>${esc(t.txt)}</span></li>`).join("")}</ol>`;
 }
 function renderQueue(){
-  const q=S.reqs;
-  $("queue").innerHTML = q.length? q.map(r=>{
-    const u=U(r.user), s=SY(r.sys), a=approverFor(r.user);
+  $("queue").innerHTML=S.reqs.length?S.reqs.map(r=>{
+    const s=SY(r.sys), a=approverFor(r.user);
     return `<div class="req">
-      <div><b>${esc(u.name)}</b> → ${esc(s.name)}</div>
+      <div><b class="mono">${esc(r.user)}</b> → ${esc(s.name)}</div>
       <div class="meta">${esc(r.reason)}${r.ticket?" · "+esc(r.ticket):""} · ${r.dur} min · aangevraagd ${fmt(r.t)}</div>
       <div class="acts">
         <button type="button" class="btn small primary" data-approve="${r.id}">Goedkeuren als ${esc(a.name)}</button>
         <button type="button" class="btn small danger" data-reject="${r.id}">Afwijzen</button>
-      </div>
-      ${U(r.user).approver?`<div class="meta">Vier-ogenprincipe: ${esc(U(r.user).name)} kan de eigen aanvraag niet goedkeuren.</div>`:""}
-    </div>`;}).join("") : `<p class="empty">Geen openstaande aanvragen.</p>`;
+      </div></div>`;}).join(""):`<p class="empty">Geen openstaande aanvragen.${S.p.jit&&S.p.polp?"":" JIT werkt samen met Least privilege: zet beide aan."}</p>`;
   const g=S.grants.filter(g=>g.until>S.clock);
-  $("grants").innerHTML = g.length? g.map(x=>{
-    const u=U(x.user), s=SY(x.sys), left=x.until-S.clock;
+  $("grants").innerHTML=g.length?g.map(x=>{
+    const left=x.until-S.clock;
     return `<div class="req grant">
-      <div style="display:flex;justify-content:space-between;gap:8px"><span><b>${esc(u.name)}</b> → ${esc(s.name)}</span><span class="mono">${left} min</span></div>
+      <div style="display:flex;justify-content:space-between;gap:8px"><span><b class="mono">${esc(x.user)}</b> → ${esc(SY(x.sys).name)}</span><span class="mono">${left} min</span></div>
       <div class="bar"><i style="width:${Math.max(0,left/x.dur*100)}%"></i></div>
-      <div class="acts"><button type="button" class="btn small danger" data-revoke="${x.id}">Intrekken</button></div>
-    </div>`;}).join("") : `<p class="empty">Niemand heeft op dit moment beheerrechten.</p>`;
+      <div class="acts"><button type="button" class="btn small danger" data-revoke="${x.id}">Intrekken</button></div></div>`;}).join("")
+    :`<p class="empty">${S.p.polp&&S.p.jit?"Niemand heeft op dit moment beheerrechten.":"Zonder JIT staan beheerrechten permanent aan; hier verschijnt niets."}</p>`;
 }
-const RES = {ok:["ok","Toegestaan"], bad:["bad","Geweigerd"], warn:["warn","Wacht"], info:["off","Info"]};
+function renderOverview(){
+  const p=S.p; let standing=0, exposed=0;
+  const per={}; DEPTS.forEach(d=>per[d.key]={out:0,adm:0,stand:0,pw:0});
+  USERS.forEach(u=>{
+    const r=per[u.role];
+    if(NORMAL.some(s=>!s.roles.includes(u.role)&&decide(u,s,FULL,p).res==="allow")) r.out++;
+    if(u.adm) r.adm++;
+    if(PRIVS.some(id=>decide(u,SY(id),FULL,p).res==="allow")||(!p.polp&&u.localAdmin)) r.stand++;
+    if(countAllow(u,p).length){ r.pw++; exposed++; }
+  });
+  PRIV.forEach(a=>{ const e=effPriv(a,p); if(e.mode==="permanent"&&e.sys.length) standing++; });
+  const lokale=p.polp?0:USERS.filter(u=>u.localAdmin).length;
+  $("overview").innerHTML=DEPTS.map(d=>{const r=per[d.key]; return `<tr data-dept="${d.key}" class="${d.key===S.dept?"cur":""}">
+    <td><b>${esc(d.name)}</b></td><td class="mono">${d.code}</td><td class="n">${nl(d.count)}</td><td class="task">${esc(d.taken)}</td>
+    <td class="n"><span class="chip ${r.out?"warn":"ok"}">${nl(r.out)}</span></td>
+    <td class="n">${r.adm}</td>
+    <td class="n"><span class="chip ${r.stand?"bad":"ok"}">${nl(r.stand)}</span></td>
+    <td class="n"><span class="chip ${r.pw?"bad":"ok"}">${nl(r.pw)}</span></td></tr>`;}).join("");
+  $("ovSummary").textContent=nl(USERS.length)+" medewerkers · "+nl(ALL_ACCOUNTS)+" accounts in totaal";
+  $("kpis").innerHTML=`
+    <div class="kpi"><span class="num mono">${nl(ALL_ACCOUNTS)}</span><small>Accounts totaal (${nl(USERS.length)} persoonlijk, ${PRIV.length} beheer-, gedeelde en serviceaccounts)</small></div>
+    <div class="kpi"><span class="num mono" style="color:var(${standing?"--bad":"--ok"})">${nl(standing)}</span><small>Bevoorrechte accounts met permanente beheerrechten${lokale?" · plus "+nl(lokale)+" lokale beheerders op werkplekken":""}</small></div>
+    <div class="kpi"><span class="num mono" style="color:var(${exposed?"--bad":"--ok"})">${nl(exposed)}</span><small>Medewerkers die met alleen een gestolen wachtwoord iets bereiken</small></div>`;
+}
+const RES={ok:["ok","Toegestaan"],bad:["bad","Geweigerd"],warn:["warn","Wacht"],info:["off","Info"]};
 function renderLog(){
-  $("log").innerHTML = S.log.length? S.log.map(l=>`<tr><td class="t">${fmt(l.t)}</td><td>${esc(l.who)}</td><td>${esc(l.what)}</td><td class="r"><span class="chip ${RES[l.res][0]}">${RES[l.res][1]}</span></td></tr>`).join("")
-    : `<tr><td colspan="4" class="muted">Nog geen gebeurtenissen.</td></tr>`;
+  $("log").innerHTML=S.log.length?S.log.map(l=>`<tr><td class="t">${fmt(l.t)}</td><td class="mono">${esc(l.who)}</td><td>${esc(l.what)}</td><td class="r"><span class="chip ${RES[l.res][0]}">${RES[l.res][1]}</span></td></tr>`).join("")
+    :`<tr><td colspan="4" class="muted">Nog geen gebeurtenissen.</td></tr>`;
 }
 function renderClock(){ $("clock").textContent=fmt(S.clock); $("pause").textContent=S.running?"Pauze":"Hervat"; }
-function live(){ renderClock(); renderSystems(); renderTrace(); renderQueue(); renderBlast(); renderLog(); }
-function all(){ renderPolicy(); renderUsers(); renderSession(); live(); }
+
+/* ---------- Render: managersomgeving ---------- */
+const insight=()=>S.p.polp||S.p.jit;
+function groupsOf(row){
+  if(row.k==="u"){ const u=row.x; const g=[...u.rights].map(id=>SY(id).group); if(u.localAdmin&&!S.p.polp) g.push("Local Admins (WS)"); return g; }
+  return effPriv(row.x,S.p).sys.map(id=>SY(id).group).concat(row.x.type==="beheer"&&!S.p.polp&&rnd2(row.x.id)?["APP_Admin_OLD"]:[]);
+}
+function rnd2(s){ let h=0; for(const c of s) h=(h*31+c.charCodeAt(0))|0; return (h&7)===0; }
+function invRows(){
+  const p=S.p, f=S.inv, q=f.q.trim().toLowerCase();
+  let rows=insight()
+    ? USERS.map(u=>({k:"u",x:u})).concat(PRIV.map(a=>({k:"p",x:a})))
+    : MESSY_ORDER;
+  rows=rows.map(r=>{
+    if(r.k==="u"){
+      const u=r.x, outside=!p.polp?[...u.rights].filter(id=>!SY(id).roles.includes(u.role)):[];
+      const local=u.localAdmin&&!p.polp;
+      return {r, id:u.id, type:"persoonlijk", owner:u.id, dept:u.role, priv:local?["Lokale beheerder werkplek"]:[], privIds:[], excess:local||outside.length>0, outside, mode:local?"permanent":"geen", bron:"AD-export", last:u.last, ownerKnown:true};
+    }
+    const a=r.x, e=effPriv(a,p), ex=excessOf(a,p);
+    return {r, id:a.id, type:a.type, owner:a.owner, dept:a.dept, priv:e.sys.map(id=>SY(id).name), privIds:e.sys, excess:ex.length>0, exIds:ex, mode:e.mode, bron:a.bron, last:a.last, ownerKnown:a.ownerKnown, a};
+  });
+  if(q) rows=rows.filter(o=>o.id.toLowerCase().includes(q)||(o.owner||"").toLowerCase().includes(q));
+  if(insight()){
+    if(f.type) rows=rows.filter(o=>o.type===f.type);
+    if(f.sys) rows=rows.filter(o=>o.privIds.includes(f.sys));
+    if(f.priv) rows=rows.filter(o=>o.priv.length);
+    if(f.excess) rows=rows.filter(o=>o.excess);
+    const order={beheer:0,gedeeld:1,service:2,wees:3,persoonlijk:4};
+    rows.sort((a,b)=>(b.priv.length>0)-(a.priv.length>0)||order[a.type]-order[b.type]||a.id.localeCompare(b.id));
+  }
+  return rows;
+}
+function renderManager(){
+  const p=S.p, ins=insight();
+  // Kop
+  $("mgrMode").innerHTML=ins?`<span class="chip ok">Centrale PAM-inventaris actief</span>`:`<span class="chip bad">Geen centraal overzicht</span>`;
+  $("mgrIntro").textContent=ins
+    ? "Alle accounts staan in één inventaris met type, eigenaar en rechten. Managers zien per bedrijfskritische applicatie wie beheerrechten heeft en of dat nodig is."
+    : "Accountgegevens komen uit losse bronnen die niet op elkaar aansluiten. Er is niet vastgelegd welk account een beheeraccount is, van wie het is of welke rechten nodig zijn.";
+  $("mgrSources").innerHTML=ins?""
+    : ["AD-export (okt 2026)","Lokale admins (script per werkplek)","Applicatie-accounts (Excel IT)","Lokale accounts op servers"].map(s=>`<span class="src">${s}</span>`).join("");
+
+  // Bevindingen
+  const beheer=PRIV.filter(a=>a.type==="beheer");
+  const exc=beheer.filter(a=>excessOf(a,p).length).length;
+  const pct=Math.round(exc/beheer.length*100);
+  const unknown=PRIV.filter(a=>{const e=effPriv(a,p);return a.type!=="beheer"&&e.sys.length&&e.mode!=="kluis";}).length + (ins?0:beheer.filter(a=>!a.ownerKnown).length);
+  const critPriv=PRIV.filter(a=>{const e=effPriv(a,p);return e.mode==="permanent"&&e.sys.some(id=>SY(id).kritiek);}).length;
+  const F=[
+    {ok:exc===0, title:pct+"% van de beheerders heeft meer rechten dan nodig", txt:nl(exc)+" van "+beheer.length+" beheeraccounts hebben beheerrechten die niet bij hun functie horen."+(exc?" Oplossing: Least privilege.":"")},
+    {ok:ins&&unknown===0, title:ins?"Overzicht wie waar extra rechten heeft":"Geen overzicht wie waar extra rechten heeft", txt:ins?("Centrale inventaris van alle "+nl(ALL_ACCOUNTS)+" accounts. "+(unknown?nl(unknown)+" bevoorrechte accounts zonder persoonlijke eigenaar hebben nog rechten.":"Elk account met beheerrechten heeft een eigenaar."))
+      :"Rechten staan verspreid over vier bronnen. "+nl(unknown)+" bevoorrechte accounts hebben geen bekende eigenaar (gedeeld, service, oud-medewerker of niet vastgelegd)."},
+    {ok:ins&&critPriv===0, title:ins?"Inzicht in beheertoegang tot bedrijfskritische applicaties":"Managers hebben onvoldoende inzicht in beheertoegang tot bedrijfskritische applicaties", txt:(ins?"Per applicatie zichtbaar in de tabel hieronder. ":"Managers kunnen niet zien wie beheerrechten heeft. ")+nl(critPriv)+" accounts hebben permanent beheerrechten op een bedrijfskritische applicatie."}
+  ];
+  $("findings").innerHTML=F.map(f=>`<div class="finding ${f.ok?"ok":"bad"}"><span class="chip ${f.ok?"ok":"bad"}">${f.ok?"Opgelost":"Probleem"}</span><div><strong>${esc(f.title)}</strong><p class="muted">${esc(f.txt)}</p></div></div>`).join("");
+
+  // Kritieke applicaties
+  const crit=SYSTEMS.filter(s=>s.kind==="bevoorrecht"&&s.kritiek);
+  if(!ins){
+    $("critNote").textContent="Manager kan dit nu niet zien; de werkelijke aantallen komen uit de audit.";
+    $("critHead").innerHTML=`<tr><th>Applicatie</th><th>AD-groep</th><th class="n">Zichtbaar voor manager</th><th class="n">Werkelijk (uit audit)</th><th class="n">Waarvan zonder bekende eigenaar</th></tr>`;
+    $("crit").innerHTML=crit.map(s=>{
+      const all=PRIV.filter(a=>effPriv(a,p).sys.includes(s.id));
+      const unk=all.filter(a=>a.type!=="beheer"||!a.ownerKnown).length;
+      return `<tr><td><b>${esc(s.name)}</b> <span class="muted">${esc(s.full)}</span></td><td class="mono">${esc(s.group)}</td><td class="n"><span class="chip off">onbekend</span></td><td class="n"><span class="chip bad">${all.length}</span></td><td class="n">${unk}</td></tr>`;}).join("");
+  } else {
+    $("critNote").textContent="Klik op een applicatie om de inventaris daarop te filteren.";
+    $("critHead").innerHTML=`<tr><th>Applicatie</th><th class="n">Accounts met beheerrechten</th><th class="n">Nodig voor functie</th><th class="n">Meer dan nodig</th><th class="n">Gedeeld / zonder eigenaar</th><th class="n">Permanent</th><th class="n">Via JIT / kluis</th></tr>`;
+    $("crit").innerHTML=crit.map(s=>{
+      const all=PRIV.filter(a=>effPriv(a,p).sys.includes(s.id));
+      const need=all.filter(a=>a.needed.includes(s.id)).length;
+      const unk=all.filter(a=>a.type==="gedeeld"||a.type==="wees").length;
+      const perm=all.filter(a=>effPriv(a,p).mode==="permanent").length;
+      const jit=all.length-perm;
+      return `<tr data-crit="${s.id}" class="${S.inv.sys===s.id?"cur":""}" style="cursor:pointer"><td><b>${esc(s.name)}</b> <span class="muted">${esc(s.full)}</span></td><td class="n">${all.length}</td><td class="n">${need}</td>
+        <td class="n"><span class="chip ${all.length-need?"bad":"ok"}">${all.length-need}</span></td><td class="n"><span class="chip ${unk?"bad":"ok"}">${unk}</span></td>
+        <td class="n"><span class="chip ${perm?"warn":"ok"}">${perm}</span></td><td class="n">${jit}</td></tr>`;}).join("");
+  }
+
+  // Inventaris
+  ["invType","invSys","invPriv","invExcess"].forEach(id=>$(id).disabled=!ins);
+  if(!$("invSys").options.length) $("invSys").innerHTML=`<option value="">Alle systemen</option>`+crit.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
+  $("invSys").value=S.inv.sys;
+  $("invLock").textContent=ins?"":"Filteren op type of rechten kan niet: het type account en de benodigde rechten zijn nergens vastgelegd. Alleen zoeken op naam werkt.";
+  const rows=invRows(), per=50, pages=Math.max(1,Math.ceil(rows.length/per));
+  if(S.inv.page>=pages) S.inv.page=pages-1;
+  const slice=rows.slice(S.inv.page*per,(S.inv.page+1)*per);
+  $("invCount").textContent=nl(rows.length)+" accounts"+(ins?"":" (ongesorteerd, samengevoegd uit losse bronnen)");
+  if(!ins){
+    $("invHead").innerHTML=`<tr><th>Account</th><th>Bron</th><th>Eigenaar</th><th>Groepen</th><th>Laatst aangemeld</th></tr>`;
+    $("inv").innerHTML=slice.map(o=>`<tr><td class="mono">${esc(o.id)}</td><td>${esc(o.bron)}</td>
+      <td>${o.type==="persoonlijk"?"<span class='muted'>—</span>":o.type==="beheer"&&o.ownerKnown?`<span class="mono">${esc(o.owner)}</span>`:"<span class='chip off'>onbekend</span>"}</td>
+      <td class="grp">${esc(groupsOf(o.r).join("; "))}</td><td class="mono">${o.last}</td></tr>`).join("");
+  } else {
+    $("invHead").innerHTML=`<tr><th>Account</th><th>Type</th><th>Eigenaar</th><th>Afdeling</th><th>Beheerrechten</th><th>Status</th><th>Toegang</th><th>MFA</th></tr>`;
+    const modeChip={permanent:"<span class='chip warn'>Permanent</span>",jit:"<span class='chip ok'>JIT</span>",kluis:"<span class='chip ok'>Kluis</span>",uit:"<span class='chip off'>Uitgeschakeld</span>",geen:"<span class='muted'>—</span>"};
+    $("inv").innerHTML=slice.map(o=>{
+      let st;
+      if(o.mode==="uit") st="<span class='chip off'>Uitgeschakeld</span>";
+      else if(o.excess) st=`<span class="chip bad">${o.type==="persoonlijk"&&o.outside.length&&!o.priv.length?"Rechten buiten afdeling":"Meer dan nodig"}</span>`;
+      else st="<span class='chip ok'>Conform</span>";
+      const owner=o.type==="persoonlijk"?"<span class='muted'>zelf</span>":o.owner?`<span class="mono">${esc(o.owner)}</span>`:(o.type==="service"?"IT (applicatie-eigenaar)":"<span class='chip bad'>geen</span>");
+      const priv=o.priv.length?o.priv.map(n=>esc(n)).join(", "):"<span class='muted'>—</span>";
+      return `<tr><td class="mono">${esc(o.id)}</td><td>${TYPE_LABEL[o.type]}</td><td>${owner}</td><td>${o.dept?esc(ROLES[o.dept]):"<span class='muted'>—</span>"}</td>
+        <td>${priv}${o.exIds&&o.exIds.length?` <span class="muted">(overbodig: ${o.exIds.map(id=>esc(SY(id).name)).join(", ")})</span>`:""}</td><td>${st}</td><td>${modeChip[o.mode]}</td>
+        <td>${o.type==="service"?"<span class='muted'>n.v.t.</span>":p.zt?"<span class='chip ok'>Verplicht</span>":"<span class='chip warn'>Niet afgedwongen</span>"}</td></tr>`;}).join("");
+  }
+  if(!slice.length) $("inv").innerHTML=`<tr><td colspan="8" class="muted">Geen accounts gevonden met deze filters.</td></tr>`;
+  $("pgInfo").textContent="Pagina "+(S.inv.page+1)+" van "+pages;
+  $("pgPrev").disabled=S.inv.page===0; $("pgNext").disabled=S.inv.page>=pages-1;
+}
+
+function live(){ renderClock(); if(S.view==="sim"){ renderSystems(); renderTrace(); renderQueue(); renderBlast(); } renderLog(); }
+function policyChanged(){ renderPolicy(); renderSession(); live(); renderOverview(); if(S.view==="mgr") renderManager(); }
+function all(){ renderPolicy(); renderUsers(); renderSession(); live(); renderOverview(); if(S.view==="mgr") renderManager(); }
 
 /* ---------- Acties ---------- */
-document.addEventListener("click", e=>{
-  const t=e.target.closest("button,[data-sel]"); if(!t) return;
-  if(t.dataset.u){ S.active=t.dataset.u; log(U(S.active).name,"Ingelogd op werkplek","info"); all(); return; }
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button,[data-sel],tr[data-dept],tr[data-crit]"); if(!t) return;
+  if(t.id==="tabSim"){ setView("sim"); live(); return; }
+  if(t.id==="tabMgr"){ setView("mgr"); return; }
+  if(t.dataset.u){ S.active=t.dataset.u; S.dept=U(S.active).role; log(S.active,"Ingelogd op werkplek ("+ROLES[S.dept]+")","info"); renderUsers(); renderSession(); live(); return; }
+  if(t.dataset.dept){ S.dept=t.dataset.dept; S.q=""; $("userSearch").value=""; S.active=(USERS.find(u=>u.role===S.dept&&(!S.onlyAdm||u.adm))||USERS.find(u=>u.role===S.dept)).id; all(); $("users").scrollTop=0; $("deptSel").scrollIntoView({behavior:"smooth",block:"center"}); return; }
+  if(t.dataset.crit){ S.inv.sys=S.inv.sys===t.dataset.crit?"":t.dataset.crit; S.inv.page=0; renderManager(); return; }
   if(t.dataset.open){
-    const u=U(S.active), s=SY(t.dataset.open), d=decide(u,s,ctxFor(u),S.p);
-    S.sel=s.id;
-    const reason=d.tr.filter(x=>x.st==="bad").map(x=>x.txt)[0];
-    log(u.name, s.name+": "+s.action+(reason?" — "+reason:""), d.res==="allow"?"ok":"bad");
-    live(); return;
+    const u=U(S.active), s=SY(t.dataset.open), d=decide(u,s,ctxFor(u),S.p); S.sel=s.id;
+    const why=d.tr.filter(x=>x.st==="bad").map(x=>x.txt)[0];
+    log(u.id,s.name+": "+s.action+(why?" — "+why:""),d.res==="allow"?"ok":"bad"); live(); return;
   }
   if(t.dataset.jit){ S.sel=t.dataset.jit; openJit(t.dataset.jit); live(); return; }
   if(t.dataset.approve){
     const r=S.reqs.find(x=>x.id==t.dataset.approve); if(!r) return;
-    S.reqs=S.reqs.filter(x=>x!==r);
-    S.grants.push({id:S.nid++, user:r.user, sys:r.sys, until:S.clock+r.dur, dur:r.dur});
-    log(approverFor(r.user).name, "JIT goedgekeurd: "+U(r.user).name+" → "+SY(r.sys).name+" voor "+r.dur+" min","ok");
-    live(); return;
+    S.reqs=S.reqs.filter(x=>x!==r); S.grants.push({id:S.nid++,user:r.user,sys:r.sys,until:S.clock+r.dur,dur:r.dur});
+    log(approverFor(r.user).name,"JIT goedgekeurd: "+r.user+" → "+SY(r.sys).name+" voor "+r.dur+" min","ok"); live(); return;
   }
   if(t.dataset.reject){
     const r=S.reqs.find(x=>x.id==t.dataset.reject); if(!r) return;
-    S.reqs=S.reqs.filter(x=>x!==r);
-    log(approverFor(r.user).name, "JIT afgewezen: "+U(r.user).name+" → "+SY(r.sys).name,"bad");
-    live(); return;
+    S.reqs=S.reqs.filter(x=>x!==r); log(approverFor(r.user).name,"JIT afgewezen: "+r.user+" → "+SY(r.sys).name,"bad"); live(); return;
   }
   if(t.dataset.revoke){
     const g=S.grants.find(x=>x.id==t.dataset.revoke); if(!g) return;
-    S.grants=S.grants.filter(x=>x!==g);
-    log(approverFor(g.user).name,"JIT-sessie ingetrokken: "+U(g.user).name+" → "+SY(g.sys).name,"info");
-    live(); return;
+    S.grants=S.grants.filter(x=>x!==g); log(approverFor(g.user).name,"JIT-sessie ingetrokken: "+g.user+" → "+SY(g.sys).name,"info"); live(); return;
   }
+  if(t.id==="pgPrev"){ S.inv.page=Math.max(0,S.inv.page-1); renderManager(); return; }
+  if(t.id==="pgNext"){ S.inv.page++; renderManager(); return; }
   if(t.dataset.sel){ S.sel=t.dataset.sel; renderSystems(); renderTrace(); }
 });
-document.addEventListener("keydown", e=>{
-  const t=e.target; if(t.dataset && t.dataset.sel && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); S.sel=t.dataset.sel; renderSystems(); renderTrace(); }
+document.addEventListener("keydown",e=>{
+  const t=e.target; if(t.dataset&&t.dataset.sel&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); S.sel=t.dataset.sel; renderSystems(); renderTrace(); }
 });
-document.addEventListener("change", e=>{
+$("userSearch").addEventListener("input",e=>{ S.q=e.target.value; renderUsers(); });
+$("invSearch").addEventListener("input",e=>{ S.inv.q=e.target.value; S.inv.page=0; renderManager(); });
+document.addEventListener("change",e=>{
   const t=e.target;
-  if(t.dataset.k){ S.p[t.dataset.k]=t.checked; log("Beheer", PRINCIPLES.find(p=>p.k===t.dataset.k).name+" "+(t.checked?"ingeschakeld":"uitgeschakeld"),"info"); renderPolicy(); live(); }
-  if(t.id==="mfaT"){ S.mfa[S.active]=t.checked; log(U(S.active).name, t.checked?"MFA bevestigd":"MFA-sessie verlopen","info"); live(); }
-  if(t.id==="jumpT"){ S.jump[S.active]=t.checked; log(U(S.active).name, t.checked?"Verbonden via PAM-jumphost":"Jumphost-sessie beëindigd","info"); live(); }
+  if(t.dataset.k){ S.p[t.dataset.k]=t.checked; log("Beheer",PRINCIPLES.find(p=>p.k===t.dataset.k).name+" "+(t.checked?"ingeschakeld":"uitgeschakeld"),"info"); policyChanged(); return; }
+  if(t.id==="deptSel"){ S.dept=t.value; S.q=""; $("userSearch").value=""; S.active=(USERS.find(u=>u.role===S.dept&&(!S.onlyAdm||u.adm))||USERS.find(u=>u.role===S.dept)).id; all(); $("users").scrollTop=0; return; }
+  if(t.id==="onlyAdm"){ S.onlyAdm=t.checked; renderUsers(); return; }
+  if(t.id==="mfaT"){ S.mfa[S.active]=t.checked; log(S.active,t.checked?"MFA bevestigd":"MFA-sessie verlopen","info"); live(); return; }
+  if(t.id==="jumpT"){ S.jump[S.active]=t.checked; log(S.active,t.checked?"Verbonden via PAM-jumphost":"Jumphost-sessie beëindigd","info"); live(); return; }
+  if(t.id==="invType"){ S.inv.type=t.value; S.inv.page=0; renderManager(); return; }
+  if(t.id==="invSys"){ S.inv.sys=t.value; S.inv.page=0; renderManager(); return; }
+  if(t.id==="invPriv"){ S.inv.priv=t.checked; S.inv.page=0; renderManager(); return; }
+  if(t.id==="invExcess"){ S.inv.excess=t.checked; S.inv.page=0; renderManager(); return; }
 });
-function preset(on){ for(const k in S.p) S.p[k]=on; log("Beheer", on?"Scenario: volledige PAM toegepast":"Scenario: huidige situatie zonder PAM","info"); renderPolicy(); live(); }
+function preset(on){ for(const k in S.p) S.p[k]=on; log("Beheer",on?"Scenario: volledige PAM toegepast":"Scenario: huidige situatie zonder PAM","info"); policyChanged(); }
 $("presetOn").onclick=()=>preset(true);
 $("presetOff").onclick=()=>preset(false);
 $("pause").onclick=()=>{ S.running=!S.running; renderClock(); };
@@ -519,15 +920,13 @@ $("clearLog").onclick=()=>{ S.log=[]; renderLog(); };
 $("copyLog").onclick=async()=>{
   const txt=["Tijd\tWie\tGebeurtenis\tResultaat"].concat(S.log.slice().reverse().map(l=>[fmt(l.t),l.who,l.what,RES[l.res][1]].join("\t"))).join("\n");
   const b=$("copyLog");
-  try{ await navigator.clipboard.writeText(txt); b.textContent="Gekopieerd"; }
-  catch(_){ b.textContent="Kopiëren niet toegestaan"; }
+  try{ await navigator.clipboard.writeText(txt); b.textContent="Gekopieerd"; }catch(_){ b.textContent="Kopiëren niet toegestaan"; }
   setTimeout(()=>b.textContent="Kopieer audittrail",1600);
 };
-
 let jitSys=null;
 function openJit(sid){
   jitSys=sid; const s=SY(sid);
-  $("jitWhat").textContent = U(S.active).name+" vraagt beheerrechten op "+s.name+": "+s.action.toLowerCase()+". Goedkeuring door "+approverFor(S.active).name+".";
+  $("jitWhat").textContent=S.active+" vraagt beheerrechten op "+s.name+": "+s.action.toLowerCase()+". Goedkeuring door "+approverFor(S.active).name+".";
   $("jitTicket").value=""; $("jitOverlay").hidden=false; $("jitReason").focus();
 }
 function closeJit(){ $("jitOverlay").hidden=true; jitSys=null; }
@@ -535,26 +934,28 @@ $("jitCancel").onclick=closeJit;
 $("jitOverlay").addEventListener("click",e=>{ if(e.target.id==="jitOverlay") closeJit(); });
 $("jitForm").addEventListener("submit",e=>{
   e.preventDefault(); if(!jitSys) return;
-  const r={id:S.nid++, user:S.active, sys:jitSys, reason:$("jitReason").value, ticket:$("jitTicket").value.trim(), dur:+$("jitDur").value, t:S.clock};
-  S.reqs.push(r);
-  log(U(S.active).name,"JIT aangevraagd: "+SY(jitSys).name+" ("+r.reason+(r.ticket?", "+r.ticket:"")+", "+r.dur+" min)","warn");
+  const r={id:S.nid++,user:S.active,sys:jitSys,reason:$("jitReason").value,ticket:$("jitTicket").value.trim(),dur:+$("jitDur").value,t:S.clock};
+  S.reqs.push(r); log(S.active,"JIT aangevraagd: "+SY(jitSys).name+" ("+r.reason+(r.ticket?", "+r.ticket:"")+", "+r.dur+" min)","warn");
   closeJit(); live();
 });
-document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !$("jitOverlay").hidden) closeJit(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("jitOverlay").hidden) closeJit(); });
 
 setInterval(()=>{
   if(!S.running) return;
   S.clock++;
-  S.grants.forEach(g=>{ if(g.until===S.clock) log(U(g.user).name,"JIT-sessie "+SY(g.sys).name+" verlopen; rechten automatisch ingetrokken","info"); });
+  S.grants.forEach(g=>{ if(g.until===S.clock) log(g.user,"JIT-sessie "+SY(g.sys).name+" verlopen; rechten automatisch ingetrokken","info"); });
   S.grants=S.grants.filter(g=>g.until>S.clock);
   live();
 },1000);
 
-/* Startsituatie */
-document.title = "PAM-simulator · "+CONFIG.organisatie;
-$("orgTitle").textContent = "PAM-simulator · "+CONFIG.organisatie;
-$("orgDesc").textContent = CONFIG.omschrijving;
-log("Systeem","Simulatie gestart voor "+CONFIG.organisatie+" ("+CONFIG.domein+")","info");
+/* Start */
+document.title="PAM-simulator · "+CONFIG.organisatie;
+$("orgTitle").textContent="PAM-simulator · "+CONFIG.organisatie;
+$("orgDesc").textContent=CONFIG.omschrijving;
+S.dept=U(S.active).role;
+log("Systeem","Simulatie gestart voor "+CONFIG.organisatie+" ("+CONFIG.domein+") in de huidige situatie","info");
+if(location.hash==="#manager") S.view="mgr";
+setView(S.view);
 all();
 </script>
 </body>
